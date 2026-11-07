@@ -800,7 +800,7 @@ figure {
   cursor: grab;
   user-select: none;
   -webkit-user-select: none;
-  touch-action: none;
+  touch-action: pan-y; /* en celu, deslizar vertical sigue scrolleando la página */
 }
 .carta:active {
   cursor: grabbing;

@@ -53,12 +53,12 @@ export default function Mazo({ abrir }) {
               initial={false}
               animate={{ rotate: pos.rotate, x: pos.x, y: pos.y, scale: top ? 1 : 0.96 }}
               transition={quieto ? { duration: 0 } : { type: 'spring', duration: 0.55, bounce: 0.22 }}
-              drag={top}
+              drag={top ? 'x' : false}
               dragSnapToOrigin
               dragElastic={0.6}
               whileDrag={{ scale: 1.04, rotate: 0, filter: 'drop-shadow(0 22px 30px rgba(43, 3, 12, 0.35))' /* taste-skill-ignore: la carta flota mientras se arrastra */ }}
               onDragEnd={(_, info) => {
-                if (Math.abs(info.offset.x) > 110 || Math.abs(info.velocity.x) > 500 || Math.abs(info.offset.y) > 140) alFondo()
+                if (Math.abs(info.offset.x) > 110 || Math.abs(info.velocity.x) > 500) alFondo()
               }}
               onTap={() => top && darVuelta(id)}
               aria-hidden={!top}
