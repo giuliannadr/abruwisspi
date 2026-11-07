@@ -61,13 +61,15 @@ export default function Hero() {
 
   return (
     <section className="portada" id="inicio" ref={ref}>
-      <div className="portada__mesa" ref={mesa} aria-hidden="true">
+      <div className="portada__fondo" aria-hidden="true">
+      <div className="portada__mesa" ref={mesa}>
         {piezasMesa.map(([src, t, w, x, y, r]) => (
           <figure className="portada__pieza" key={src} style={{ left: x, top: y, width: w, rotate: `${r}deg` }}>
             <img src={img(src, 'sm')} alt="" draggable="false" loading="eager" />
             <figcaption>{t}</figcaption>
           </figure>
         ))}
+      </div>
       </div>
 
       <h1 className="portada__nombre">

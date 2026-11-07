@@ -23,7 +23,7 @@ export default function Pliegos({ abrir }) {
           scrollTrigger: { trigger: el, start: 'top bottom', end: 'bottom top', scrub: true },
         })
         // el detalle entra recortándose desde abajo
-        gsap.from(el.querySelector('.pliego__detalle'), {
+        if (el.querySelector('.pliego__detalle')) gsap.from(el.querySelector('.pliego__detalle'), {
           clipPath: 'inset(100% 0 0 0)',
           duration: 1.1,
           ease: 'expo.out',
@@ -44,7 +44,7 @@ export default function Pliegos({ abrir }) {
       </header>
       {lista.map((p, i) => {
         const grande = p.piezas[0]
-        const det = p.piezas[1] ?? p.piezas[0]
+        const det = p.piezas[1] // solo si hay una segunda pieza; nunca un recorte de la misma
         return (
           <article className="pliego" key={p.id} data-lado={i % 2 ? 'der' : 'izq'} style={{ '--fondo': p.fondo, '--tinta': p.tinta }}>
             <button className="pliego__grande" onClick={(e) => abrir(p.id, e.currentTarget.querySelector('img'))} aria-label={`Ver ${p.titulo}`}>
@@ -52,12 +52,16 @@ export default function Pliegos({ abrir }) {
             </button>
             <div className="pliego__panel">
               <h3 className="pliego__titulo" data-reveal style={{ '--i': 1, fontSize: p.titulo.length > 12 ? 'clamp(52px, 5.6vw, 104px)' : undefined }}>{p.titulo}</h3>
-              <figure className="pliego__detalle">
-                <img src={img(det.src, 'sm')} alt={det.alt} loading="lazy" style={det === grande ? { objectPosition: '60% 35%', scale: '1.6' } : undefined} />
-              </figure>
+              {det ? (
+                <figure className="pliego__detalle">
+                  <img src={img(det.src, 'sm')} alt={det.alt} loading="lazy" />
+                </figure>
+              ) : (
+                <p className="pliego__lead" data-reveal style={{ '--i': 2 }}>{p.texto}</p>
+              )}
               <div className="pliego__pie" data-reveal style={{ '--i': 2 }}>
                 <p className="pliego__disc">{p.disciplina}</p>
-                <p className="pliego__texto">{p.texto}</p>
+                {det && <p className="pliego__texto">{p.texto}</p>}
                 <button className="pliego__ver" onClick={(e) => abrir(p.id, e.currentTarget.closest('.pliego').querySelector('[data-pieza]'))}>
                   Ver proyecto
                 </button>

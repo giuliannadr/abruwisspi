@@ -263,6 +263,14 @@ figure {
   overflow: hidden;
   background: var(--rosa);
 }
+/* contenedor quieto de la mesa: se desvanece abajo para fundirse con la sección siguiente */
+.portada__fondo {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  -webkit-mask-image: linear-gradient(to bottom, #000 78%, transparent 100%);
+  mask-image: linear-gradient(to bottom, #000 78%, transparent 100%);
+}
 .portada__mesa {
   position: absolute;
   left: 0;
@@ -324,6 +332,9 @@ figure {
 .portada__abril {
   position: absolute;
   z-index: 3;
+  /* los pies se desvanecen: no hay corte al pasar a la sección siguiente */
+  -webkit-mask-image: linear-gradient(to bottom, #000 72%, transparent 98%);
+  mask-image: linear-gradient(to bottom, #000 72%, transparent 98%);
   /* empieza justo donde termina ABRIL (≈1.9em del nombre), así nunca tapa la L */
   left: calc(var(--m) + min(29vw, 40vh) * 1.86);
   bottom: 0;
@@ -643,14 +654,22 @@ figure {
 .pliego__detalle {
   align-self: center;
   justify-self: center;
-  width: min(48%, 300px);
-  aspect-ratio: 4 / 5;
-  overflow: hidden;
+  width: min(62%, 380px);
 }
+/* la segunda pieza, entera */
 .pliego__detalle img {
   width: 100%;
-  height: 100%;
-  object-fit: cover;
+  height: auto;
+  max-height: 40svh;
+  object-fit: contain;
+}
+.pliego__lead {
+  align-self: center;
+  margin: 0;
+  max-width: 24ch;
+  font-size: clamp(24px, 2.4vw, 38px);
+  line-height: 1.18;
+  letter-spacing: -0.01em;
 }
 .pliego__pie {
   display: grid;
@@ -662,6 +681,12 @@ figure {
 }
 .pliego__disc {
   margin: 0;
+}
+/* sin texto al pie (va en el medio): categoría a la izquierda, botón a la derecha */
+.pliego__pie:not(:has(.pliego__texto)) {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
 }
 .pliego__texto {
   margin: 0;
@@ -712,7 +737,8 @@ figure {
     max-height: 56svh;
   }
   .pliego__detalle,
-  .pliego__texto {
+  .pliego__texto,
+  .pliego__lead {
     display: none;
   }
   .pliego__pie {
