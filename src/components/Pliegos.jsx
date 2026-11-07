@@ -1,6 +1,6 @@
 import { useLayoutEffect, useRef } from 'react'
 import { gsap } from 'gsap'
-import { destacados, porId } from '../data/proyectos'
+import { destacados, porId, temaDe } from '../data/proyectos'
 import { img } from '../data/site'
 import { reduce } from '../lib/motion'
 
@@ -46,7 +46,7 @@ export default function Pliegos({ abrir }) {
         const grande = p.piezas[0]
         const det = p.piezas[1] // solo si hay una segunda pieza; nunca un recorte de la misma
         return (
-          <article className="pliego" key={p.id} data-lado={i % 2 ? 'der' : 'izq'} style={{ '--fondo': p.fondo, '--tinta': p.tinta }}>
+          <article className="pliego" key={p.id} data-lado={i % 2 ? 'der' : 'izq'} style={{ '--fondo': temaDe(p.id).fondo, '--tinta': temaDe(p.id).tinta }}>
             <button className="pliego__grande" onClick={(e) => abrir(p.id, e.currentTarget.querySelector('img'))} aria-label={`Ver ${p.titulo}`}>
               <img src={img(grande.src, 'sm')} srcSet={`${img(grande.src, 'sm')} 900w, ${img(grande.src)} 1800w`} sizes="(max-width: 860px) 100vw, 50vw" alt={grande.alt} loading="lazy" data-pieza={p.id} />
             </button>

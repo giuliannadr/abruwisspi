@@ -351,17 +351,25 @@ figure {
   --mk: url(/tex/abril-sentada-papel.png);
   background: var(--claro);
 }
+/* foto teñida debajo de los puntos, suave: se ve más la cara sin perder la trama */
+.portada__abril > .portada__abril-foto {
+  -webkit-mask: none;
+  mask: none;
+  background: url(/tex/abril-sentada-tono.webp) center / 100% 100% no-repeat;
+  opacity: 0.42;
+}
 .portada__abril-fluo {
   --mk: url(/tex/abril-sentada-ht.png);
   background: var(--fluo);
-  transform: translate(10px, -6px);
+  transform: translate(8px, -5px);
   mix-blend-mode: multiply;
-  opacity: 0.9;
+  opacity: 0.72;
 }
 .portada__abril-tinta {
   --mk: url(/tex/abril-sentada-ht.png);
   background: var(--cherry);
   mix-blend-mode: multiply;
+  opacity: 0.9;
 }
 .portada__bajada {
   position: absolute;
@@ -620,7 +628,7 @@ figure {
   border: 0;
   overflow: hidden;
   /* la pieza entera sobre su propio color, un tono más oscuro que el panel */
-  background: color-mix(in oklab, var(--fondo) 78%, black);
+  background: color-mix(in oklab, var(--fondo) 86%, #2b030c);
   cursor: zoom-in;
 }
 .pliego__grande img {

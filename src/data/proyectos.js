@@ -150,3 +150,17 @@ export const proyectos = [
 export const destacados = ['atalaya', 'gatsby', 'dictador', 'morfologia', 'trago', 'futttura', 'avira', 'winx']
 
 export const porId = Object.fromEntries(proyectos.map((p) => [p.id, p]))
+
+// Coherencia de color: el marco de cada proyecto usa solo los tonos del sitio, en orden.
+// Las piezas mantienen sus colores reales; lo que se unifica es el fondo donde se apoyan.
+// (Los campos fondo/tinta de cada proyecto quedan como referencia del color propio de la pieza.)
+export const temas = [
+  { fondo: '#B00F34', tinta: '#FDEEF1' }, // cherry
+  { fondo: '#F6D3DA', tinta: '#2B030C' }, // rosa
+  { fondo: '#2B030C', tinta: '#F6D3DA' }, // bordó
+  { fondo: '#FDEEF1', tinta: '#B00F34' }, // rosa claro
+]
+export const temaDe = (id) => {
+  const i = destacados.indexOf(id)
+  return temas[(i < 0 ? 0 : i) % temas.length]
+}

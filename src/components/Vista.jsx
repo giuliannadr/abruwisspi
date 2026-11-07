@@ -1,5 +1,5 @@
 import { useEffect, useRef } from 'react'
-import { proyectos } from '../data/proyectos'
+import { proyectos, temaDe } from '../data/proyectos'
 import { img } from '../data/site'
 
 // Vista de un proyecto: su color, su texto y todas las piezas.
@@ -18,7 +18,7 @@ export default function Vista({ p, cerrar, abrir }) {
   }, [p.id, cerrar])
 
   return (
-    <div className="vista" ref={ref} role="dialog" aria-modal="true" aria-labelledby="vista-h" data-lenis-prevent style={{ '--tinta': p.tinta, '--fondo': p.fondo }}>
+    <div className="vista" ref={ref} role="dialog" aria-modal="true" aria-labelledby="vista-h" data-lenis-prevent style={{ '--tinta': temaDe(p.id).tinta, '--fondo': temaDe(p.id).fondo }}>
       <div className="vista__barra">
         <button className="vista__volver" onClick={cerrar}>Volver</button>
       </div>

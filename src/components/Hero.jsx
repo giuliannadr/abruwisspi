@@ -79,6 +79,7 @@ export default function Hero() {
 
       <div className="portada__abril" aria-hidden="true">
         <div className="portada__abril-papel" />
+        <div className="portada__abril-foto" />
         <div className="portada__abril-fluo" />
         <div className="portada__abril-tinta" />
       </div>
