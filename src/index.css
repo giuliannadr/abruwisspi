@@ -332,9 +332,7 @@ figure {
 .portada__abril {
   position: absolute;
   z-index: 3;
-  /* los pies se desvanecen: no hay corte al pasar a la sección siguiente */
-  -webkit-mask-image: linear-gradient(to bottom, #000 72%, transparent 98%);
-  mask-image: linear-gradient(to bottom, #000 72%, transparent 98%);
+  /* los pies se disuelven en el semitono (está en la imagen), sin corte al pasar a la sección siguiente */
   /* empieza justo donde termina ABRIL (≈1.9em del nombre), así nunca tapa la L */
   left: calc(var(--m) + min(29vw, 40vh) * 1.86);
   bottom: 0;
@@ -350,7 +348,7 @@ figure {
   mask: var(--mk) center / 100% 100% no-repeat;
 }
 .portada__abril-papel {
-  --mk: url(/tex/abril-cuerpo.png);
+  --mk: url(/tex/abril-cuerpo-papel.png);
   background: var(--claro);
 }
 .portada__abril-fluo {
