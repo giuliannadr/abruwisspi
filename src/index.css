@@ -337,7 +337,7 @@ figure {
   left: calc(var(--m) + min(29vw, 40vh) * 1.86);
   bottom: 0;
   height: 94svh;
-  aspect-ratio: 785 / 1333;
+  aspect-ratio: 691 / 1088;
   pointer-events: none;
 }
 .portada__abril > div,
@@ -348,18 +348,18 @@ figure {
   mask: var(--mk) center / 100% 100% no-repeat;
 }
 .portada__abril-papel {
-  --mk: url(/tex/abril-cuerpo-papel.png);
+  --mk: url(/tex/abril-sentada-papel.png);
   background: var(--claro);
 }
 .portada__abril-fluo {
-  --mk: url(/tex/abril-cuerpo-ht.png);
+  --mk: url(/tex/abril-sentada-ht.png);
   background: var(--fluo);
   transform: translate(10px, -6px);
   mix-blend-mode: multiply;
   opacity: 0.9;
 }
 .portada__abril-tinta {
-  --mk: url(/tex/abril-cuerpo-ht.png);
+  --mk: url(/tex/abril-sentada-ht.png);
   background: var(--cherry);
   mix-blend-mode: multiply;
 }
@@ -447,7 +447,7 @@ figure {
   .portada__abril {
     left: 50%;
     height: 80svh;
-    margin-left: calc(80svh * 785 / 1333 * -0.46);
+    margin-left: calc(80svh * 691 / 1088 * -0.5);
   }
   .portada__mesa {
     opacity: 0.85;
@@ -1304,7 +1304,7 @@ figure {
 .cierre {
   position: relative;
   display: grid;
-  grid-template-columns: 7fr 5fr;
+  grid-template-columns: 6fr 5fr;
   gap: 32px;
   min-height: 100svh;
   padding: 120px var(--m) 0;
@@ -1317,9 +1317,10 @@ figure {
   flex-direction: column;
   position: relative;
   z-index: 2;
+  min-width: 0;
 }
 .cierre__invita {
-  font-size: clamp(96px, 14vw, 240px);
+  font-size: clamp(96px, 11.5vw, 210px);
 }
 .cierre__bajada {
   margin: 20px 0 48px;
@@ -1374,8 +1375,10 @@ figure {
   position: relative;
   align-self: end;
   justify-self: center;
-  height: min(86svh, 860px);
-  aspect-ratio: 691 / 1088;
+  /* entra entera en su columna: el ancho manda si la columna es angosta */
+  width: min(100%, calc(min(90svh, 900px) * 785 / 1333));
+  height: auto;
+  aspect-ratio: 785 / 1333;
 }
 .cierre__abril > div {
   position: absolute;
@@ -1384,18 +1387,18 @@ figure {
   mask: var(--mk) center / 100% 100% no-repeat;
 }
 .cierre__abril-papel {
-  --mk: url(/tex/abril-sentada.png);
+  --mk: url(/tex/abril-cuerpo-papel.png);
   background: var(--claro);
 }
 .cierre__abril-fluo {
-  --mk: url(/tex/abril-sentada-ht.png);
+  --mk: url(/tex/abril-cuerpo-ht.png);
   background: var(--fluo);
   transform: translate(10px, -6px);
   mix-blend-mode: multiply;
   opacity: 0.9;
 }
 .cierre__abril-tinta {
-  --mk: url(/tex/abril-sentada-ht.png);
+  --mk: url(/tex/abril-cuerpo-ht.png);
   background: var(--bordo);
   mix-blend-mode: multiply;
 }
