@@ -33,26 +33,27 @@ function Tira({ s, abrir }) {
   }, [loop])
 
   // Pasa sola, despacio y en loop (las fotos van dos veces para que no se note el salto).
-  // Se pausa con el mouse encima, al arrastrar, al tocar o si no se ve; nada si hay movimiento reducido.
+  // Solo se frena si la persona la mueve (arrastre o deslizar de costado) o si no se ve.
   useEffect(() => {
     const el = ref.current
     if (!el || !loop || reduce()) return
-    let raf, visible = false, encima = false, quieto = 0, resto = 0
+    let raf, visible = false, quieto = 0, resto = 0
     const io = new IntersectionObserver(([e]) => { visible = e.isIntersecting })
     io.observe(el)
-    const pausa = (ms) => () => { quieto = performance.now() + ms }
-    const entra = () => { encima = true }
-    const sale = () => { encima = false }
-    const fino = matchMedia('(pointer: fine)').matches
-    if (fino) { el.addEventListener('pointerenter', entra); el.addEventListener('pointerleave', sale) }
-    const toque = pausa(2500), rueda = pausa(1500)
+    const pausa = (ms) => { quieto = performance.now() + ms }
+    const toque = () => pausa(1e9) // quieta mientras la tengan agarrada
+    const suelta = () => { if (quieto > performance.now() + 5000) pausa(1500) }
+    addEventListener('pointerup', suelta)
+    addEventListener('pointercancel', suelta)
+    // la rueda vertical (scrollear la página) no la frena; solo el gesto de costado
+    const rueda = (e) => { if (Math.abs(e.deltaX) > Math.abs(e.deltaY)) pausa(1500) }
     el.addEventListener('pointerdown', toque)
     el.addEventListener('wheel', rueda, { passive: true })
     let last = performance.now()
     const avanzar = (t) => {
       raf = requestAnimationFrame(avanzar)
       const dt = Math.min(50, t - last); last = t
-      if (!visible || encima || t < quieto) return
+      if (!visible || t < quieto) return
       resto += dt * 0.045 // ≈ 45 px por segundo
       const px = Math.floor(resto); resto -= px
       if (!px) return
@@ -63,8 +64,8 @@ function Tira({ s, abrir }) {
     raf = requestAnimationFrame(avanzar)
     return () => {
       cancelAnimationFrame(raf); io.disconnect()
-      el.removeEventListener('pointerenter', entra); el.removeEventListener('pointerleave', sale)
       el.removeEventListener('pointerdown', toque); el.removeEventListener('wheel', rueda)
+      removeEventListener('pointerup', suelta); removeEventListener('pointercancel', suelta)
     }
   }, [loop])
 
