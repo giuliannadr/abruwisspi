@@ -65,8 +65,8 @@ export default function App() {
       <main inert={abierto ? true : undefined}>
         <Hero />
         <Sobre />
-        <Carrusel abrir={abrir} />
         <Mazo abrir={abrir} />
+        <Carrusel abrir={abrir} />
         <Disco abrir={abrir} />
         <Fotos />
       </main>

@@ -877,7 +877,6 @@ figure {
   gap: 2vw;
   overflow-x: auto;
   overscroll-behavior-x: contain;
-  scroll-snap-type: x proximity;
   padding: 8px var(--m);
   scroll-padding-inline: var(--m);
   scrollbar-width: none;

@@ -62,7 +62,10 @@ export default function Carrusel({ abrir }) {
     if (reduce()) pos.set(objetivo)
     else animate(pos, objetivo, { type: 'spring', stiffness: 170, damping: 26 })
   }, [pos])
-  const mover = useCallback((n) => ir(Math.round(pos.get()) + n), [ir, pos])
+  const mover = useCallback((n, auto = false) => {
+    if (!auto) ultimoArrastre.current = performance.now() - 300
+    ir(Math.round(pos.get()) + n)
+  }, [ir, pos])
 
   // Arrastre con mouse o dedo; al soltar, se acomoda según la velocidad.
   useEffect(() => {
@@ -88,7 +91,7 @@ export default function Carrusel({ abrir }) {
     const up = () => {
       if (!activoDrag) return
       activoDrag = false
-      setTimeout(() => { tocando.current = false }, 1200)
+      tocando.current = false
       if (!movido) return
       ultimoArrastre.current = performance.now()
       // proyecta ~140 ms de inercia y no salta más de dos piezas
@@ -119,7 +122,10 @@ export default function Carrusel({ abrir }) {
   }, [])
   useEffect(() => {
     if (!enVista || reduce()) return
-    const t = setInterval(() => { if (!tocando.current) mover(1) }, 4200)
+    // avanza sola; solo espera si alguien la tocó hace menos de 4 s
+    const t = setInterval(() => {
+      if (!tocando.current && performance.now() - ultimoArrastre.current > 4000) mover(1, true)
+    }, 4200)
     return () => clearInterval(t)
   }, [enVista, mover])
 
@@ -132,8 +138,6 @@ export default function Carrusel({ abrir }) {
       ref={ref}
       aria-roledescription="carrusel"
       aria-labelledby="carru-h"
-      onPointerEnter={() => { tocando.current = true }}
-      onPointerLeave={() => { tocando.current = false }}
       onKeyDown={(e) => {
         if (e.key === 'ArrowRight') { e.preventDefault(); mover(1) }
         if (e.key === 'ArrowLeft') { e.preventDefault(); mover(-1) }

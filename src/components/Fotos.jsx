@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
 import { series, reels } from '../data/fotos'
 import { img } from '../data/site'
-import { transicion, getLenis } from '../lib/motion'
+import { transicion, getLenis, reduce } from '../lib/motion'
 
 // Fotografía separada en proyectos: cada serie con su título, su bajada y su tira.
 // Al tocar una foto, viaja al visor (elemento compartido).
@@ -16,6 +16,57 @@ function verEnPantalla(v) {
 
 function Tira({ s, abrir }) {
   const ref = useRef(null)
+  const n = s.fotos.length
+  // solo es infinita (y pasa sola) si las fotos no entran en la pantalla
+  const [loop, setLoop] = useState(false)
+  useEffect(() => {
+    const el = ref.current
+    if (!el) return
+    const medir = () => {
+      const ancho = loop ? el.scrollWidth / 2 : el.scrollWidth
+      setLoop(ancho > el.clientWidth + 8)
+    }
+    const ro = new ResizeObserver(medir)
+    ro.observe(el)
+    el.querySelectorAll('img').forEach((im) => im.addEventListener('load', medir, { once: true }))
+    return () => ro.disconnect()
+  }, [loop])
+
+  // Pasa sola, despacio y en loop (las fotos van dos veces para que no se note el salto).
+  // Se pausa con el mouse encima, al arrastrar, al tocar o si no se ve; nada si hay movimiento reducido.
+  useEffect(() => {
+    const el = ref.current
+    if (!el || !loop || reduce()) return
+    let raf, visible = false, encima = false, quieto = 0, resto = 0
+    const io = new IntersectionObserver(([e]) => { visible = e.isIntersecting })
+    io.observe(el)
+    const pausa = (ms) => () => { quieto = performance.now() + ms }
+    const entra = () => { encima = true }
+    const sale = () => { encima = false }
+    const fino = matchMedia('(pointer: fine)').matches
+    if (fino) { el.addEventListener('pointerenter', entra); el.addEventListener('pointerleave', sale) }
+    const toque = pausa(2500), rueda = pausa(1500)
+    el.addEventListener('pointerdown', toque)
+    el.addEventListener('wheel', rueda, { passive: true })
+    let last = performance.now()
+    const avanzar = (t) => {
+      raf = requestAnimationFrame(avanzar)
+      const dt = Math.min(50, t - last); last = t
+      if (!visible || encima || t < quieto) return
+      resto += dt * 0.045 // ≈ 45 px por segundo
+      const px = Math.floor(resto); resto -= px
+      if (!px) return
+      el.scrollLeft += px
+      const mitad = el.scrollWidth / 2
+      if (el.scrollLeft >= mitad) el.scrollLeft -= mitad
+    }
+    raf = requestAnimationFrame(avanzar)
+    return () => {
+      cancelAnimationFrame(raf); io.disconnect()
+      el.removeEventListener('pointerenter', entra); el.removeEventListener('pointerleave', sale)
+      el.removeEventListener('pointerdown', toque); el.removeEventListener('wheel', rueda)
+    }
+  }, [loop])
 
   // Arrastrar la tira con el mouse (en táctil ya se desliza sola).
   useEffect(() => {
@@ -43,13 +94,28 @@ function Tira({ s, abrir }) {
     }
   }, [])
 
+  // dos vueltas de la misma serie: la segunda es copia (oculta para lectores de pantalla)
+  const vuelta = loop ? [...s.fotos, ...s.fotos] : s.fotos
   return (
-    <div className="tira" ref={ref}>
-      {s.fotos.map((f, i) => (
-        <button className="tira__cuadro" key={f.src} data-reveal style={{ '--i': Math.min(i, 5) }} onClick={(e) => abrir(s, i, e.currentTarget.querySelector('img'))} aria-label={`${s.nombre}: ampliar foto ${i + 1} de ${s.fotos.length}`}>
-          <img src={img(f.src, 'sm')} width={f.w} height={f.h} alt={s.alt} loading="lazy" draggable="false" data-foto={f.src} />
-        </button>
-      ))}
+    <div className="tira" ref={ref} data-loop={loop}>
+      {vuelta.map((f, k) => {
+        const i = k % n
+        const copia = k >= n
+        return (
+          <button
+            className="tira__cuadro"
+            key={k}
+            data-reveal={copia ? undefined : ''}
+            style={{ '--i': Math.min(i, 5) }}
+            tabIndex={copia ? -1 : 0}
+            aria-hidden={copia || undefined}
+            onClick={(e) => abrir(s, i, e.currentTarget.querySelector('img'))}
+            aria-label={`${s.nombre}: ampliar foto ${i + 1} de ${n}`}
+          >
+            <img src={img(f.src, 'sm')} width={f.w} height={f.h} alt={copia ? '' : s.alt} loading="lazy" draggable="false" data-foto={copia ? undefined : f.src} />
+          </button>
+        )
+      })}
     </div>
   )
 }
