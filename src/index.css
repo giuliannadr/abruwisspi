@@ -654,8 +654,8 @@ figure {
 
 /* ---------- Disco: funda y vinilo ---------- */
 .disco {
-  background: var(--cherry);
-  color: var(--claro);
+  background: var(--claro);
+  color: var(--bordo);
   display: grid;
   grid-template-columns: 1fr 1fr;
   min-height: 92svh;
@@ -746,6 +746,15 @@ figure {
 .tab[aria-selected='true'] > span:last-child {
   color: var(--bordo);
 }
+.disco .tab__bg {
+  background: var(--cherry);
+}
+.disco .tab[aria-selected='true'] > span:last-child {
+  color: var(--claro);
+}
+.disco__titulo {
+  color: var(--cherry);
+}
 .disco__titulo {
   font-size: clamp(64px, 7vw, 120px);
   margin: 0 0 24px;
@@ -778,14 +787,14 @@ figure {
   transform: scale(0.98);
 }
 .disco__celdas > :first-child {
-  background: var(--bordo);
+  background: var(--cherry);
 }
 .disco__celdas > :last-child {
-  background: #8a0a28;
+  background: var(--bordo);
 }
 @media (hover: hover) and (pointer: fine) {
   .disco__celdas > :hover {
-    background: #5e0619;
+    background: #8a0a28;
   }
 }
 @media (max-width: 860px) {
