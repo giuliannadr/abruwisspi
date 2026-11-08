@@ -164,3 +164,19 @@ export const temaDe = (id) => {
   const i = destacados.indexOf(id)
   return temas[(i < 0 ? 0 : i) % temas.length]
 }
+
+// Ficha de cada proyecto: COMPLETAR CON ABRIL. Lo que quede vacío no se muestra.
+// para: materia, cátedra o cliente (real o ficticio) · hice: qué hizo ella · herramientas · anio
+export const fichas = {
+  atalaya: { para: '', hice: '', herramientas: '', anio: '' },
+  gatsby: { para: '', hice: '', herramientas: '', anio: '' },
+  dictador: { para: '', hice: '', herramientas: '', anio: '' },
+  morfologia: { para: '', hice: '', herramientas: '', anio: '' },
+  trago: { para: '', hice: '', herramientas: '', anio: '' },
+  futttura: { para: '', hice: '', herramientas: '', anio: '' },
+  avira: { para: '', hice: '', herramientas: '', anio: '' },
+  winx: { para: '', hice: '', herramientas: '', anio: '' },
+  principito: { para: '', hice: '', herramientas: '', anio: '' },
+  tinta90: { para: '', hice: '', herramientas: '', anio: '' },
+  pink: { para: '', hice: '', herramientas: '', anio: '' },
+}

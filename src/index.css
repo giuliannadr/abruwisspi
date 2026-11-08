@@ -1693,3 +1693,40 @@ figure {
 .nav[data-oscuro='true']::after {
   background: var(--claro);
 }
+
+/* ---------- Vista: ficha del proyecto y anterior / siguiente ---------- */
+.vista__ficha {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+  gap: 16px 24px;
+  margin: 28px 0 0;
+  padding-top: 12px;
+  border-top: 2px solid currentColor;
+}
+.vista__ficha dt {
+  font-weight: 800;
+  font-size: 13px;
+  text-transform: uppercase;
+  opacity: 0.8;
+}
+.vista__ficha dd {
+  margin: 4px 0 0;
+}
+.vista__otros {
+  display: grid;
+  grid-template-columns: 1fr 2fr;
+}
+.vista__anterior {
+  background: color-mix(in oklab, var(--tinta) 82%, var(--fondo));
+}
+.vista__anterior strong {
+  font-size: clamp(40px, 5vw, 84px);
+}
+.vista__barra {
+  position: sticky;
+}
+@media (max-width: 760px) {
+  .vista__otros {
+    grid-template-columns: 1fr;
+  }
+}

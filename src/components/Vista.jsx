@@ -1,5 +1,5 @@
 import { useEffect, useRef } from 'react'
-import { proyectos, temaDe } from '../data/proyectos'
+import { proyectos, temaDe, fichas } from '../data/proyectos'
 import { img } from '../data/site'
 
 // Vista de un proyecto: su color, su texto y todas las piezas.
@@ -8,6 +8,9 @@ export default function Vista({ p, cerrar, abrir }) {
   const ref = useRef(null)
   const i = proyectos.findIndex((x) => x.id === p.id)
   const sig = proyectos[(i + 1) % proyectos.length]
+  const ant = proyectos[(i - 1 + proyectos.length) % proyectos.length]
+  const etiquetas = { para: 'Para', hice: 'Qué hice', herramientas: 'Herramientas', anio: 'Año' }
+  const ficha = Object.entries(fichas[p.id] ?? {}).filter(([, v]) => v)
 
   useEffect(() => {
     ref.current?.scrollTo(0, 0)
@@ -27,6 +30,16 @@ export default function Vista({ p, cerrar, abrir }) {
         <div>
           <p className="vista__disc">{p.disciplina}</p>
           <p className="vista__texto">{p.texto}</p>
+          {ficha.length > 0 && (
+            <dl className="vista__ficha">
+              {ficha.map(([k, v]) => (
+                <div key={k}>
+                  <dt>{etiquetas[k]}</dt>
+                  <dd>{v}</dd>
+                </div>
+              ))}
+            </dl>
+          )}
         </div>
       </header>
       <div className="vista__piezas">
@@ -45,10 +58,16 @@ export default function Vista({ p, cerrar, abrir }) {
           />
         ))}
       </div>
-      <button className="vista__siguiente" onClick={() => abrir(sig.id, null)}>
-        <small>Siguiente proyecto</small>
-        <strong>{sig.titulo}</strong>
-      </button>
+      <nav className="vista__otros" aria-label="Otros proyectos">
+        <button className="vista__siguiente vista__anterior" onClick={() => abrir(ant.id, null)}>
+          <small>Anterior</small>
+          <strong>{ant.titulo}</strong>
+        </button>
+        <button className="vista__siguiente" onClick={() => abrir(sig.id, null)}>
+          <small>Siguiente proyecto</small>
+          <strong>{sig.titulo}</strong>
+        </button>
+      </nav>
     </div>
   )
 }
