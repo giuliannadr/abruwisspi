@@ -1624,11 +1624,11 @@ figure {
   left: 0;
   right: 0;
   top: -2px;
-  height: 150px;
-  /* mismo color y mismo grano que la sección de arriba, para que no se note el borde */
+  height: 36px;
+  /* borde sutil: mismo color y grano que la sección de arriba, puntos chicos que se apagan rápido */
   background: url(/tex/grano-b.png), var(--arriba);
-  -webkit-mask: url(/tex/costura.png) repeat-x 0 0 / auto 150px;
-  mask: url(/tex/costura.png) repeat-x 0 0 / auto 150px;
+  -webkit-mask: url(/tex/costura.png) repeat-x 0 0 / auto 36px;
+  mask: url(/tex/costura.png) repeat-x 0 0 / auto 36px;
   pointer-events: none;
 }
 .carru {
@@ -1648,30 +1648,30 @@ figure {
 }
 .disco__placa,
 .disco__info {
-  padding-top: 150px;
+  padding-top: 110px;
   padding-bottom: 56px;
 }
 .fotos__portada {
   padding-top: 72px;
 }
 .carru {
-  padding-top: 150px;
+  padding-top: 110px;
 }
 .serie[data-costura] {
-  padding-top: 130px;
+  padding-top: 88px;
 }
 .cierre {
-  padding-top: 170px;
+  padding-top: 130px;
 }
 @media (max-width: 760px) {
   .carru {
-    padding-top: 130px;
+    padding-top: 96px;
   }
   .serie[data-costura] {
-    padding-top: 110px;
+    padding-top: 72px;
   }
   .disco__placa {
-    padding-top: 130px;
+    padding-top: 96px;
   }
   .disco__info {
     padding-top: 24px;
