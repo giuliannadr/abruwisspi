@@ -47,18 +47,6 @@ body {
   -webkit-font-smoothing: antialiased;
   overflow-x: clip;
 }
-/* grano de papel sobre todo el sitio (imagen fija, no se anima) */
-body::after {
-  content: '';
-  position: fixed;
-  inset: 0;
-  z-index: 100;
-  pointer-events: none;
-  background: url(/tex/grano-a.png);
-  opacity: 0.5;
-  transform: translateZ(0);
-}
-
 img,
 video {
   display: block;
@@ -566,191 +554,6 @@ figure {
   }
   .indice__titulo {
     font-size: 15vw;
-  }
-}
-
-/* ---------- Pliegos (destacados) ---------- */
-.pliegos__cabeza {
-  display: grid;
-  grid-template-columns: 1fr auto;
-  align-items: end;
-  gap: 24px;
-  padding: 140px var(--m) 16px;
-  margin-bottom: 0;
-  background: var(--claro);
-  border-bottom: 2px solid var(--bordo);
-}
-.pliegos__h {
-  font-weight: 900;
-  font-stretch: 62%;
-  text-transform: uppercase;
-  line-height: 0.82;
-  margin: 0;
-  font-size: clamp(88px, 15vw, 260px);
-  color: var(--cherry);
-}
-.pliegos__bajada {
-  max-width: 28ch;
-  margin: 0;
-  text-align: right;
-  font-weight: 800;
-  font-size: 13px;
-  line-height: 1.25;
-  text-transform: uppercase;
-}
-.pliegos__bajada b {
-  color: var(--cherry);
-}
-@media (max-width: 760px) {
-  .pliegos__cabeza {
-    grid-template-columns: 1fr;
-    padding-top: 96px;
-  }
-  .pliegos__h {
-    font-size: 21vw;
-  }
-  .pliegos__bajada {
-    text-align: left;
-  }
-}
-.pliego {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  min-height: 100svh;
-  background: var(--fondo);
-  color: var(--tinta);
-}
-.pliego__grande {
-  position: relative;
-  display: grid;
-  place-items: center;
-  padding: clamp(32px, 5vw, 88px);
-  border: 0;
-  overflow: hidden;
-  /* la pieza entera sobre su propio color, un tono más oscuro que el panel */
-  background: color-mix(in oklab, var(--fondo) 86%, #2b030c);
-  cursor: zoom-in;
-}
-.pliego__grande img {
-  width: auto;
-  height: auto;
-  max-width: 100%;
-  max-height: min(78svh, 820px);
-  transition: scale 600ms var(--ease-out);
-}
-@media (hover: hover) and (pointer: fine) {
-  .pliego__grande:hover img {
-    scale: 1.02;
-  }
-}
-.pliego[data-lado='der'] .pliego__grande {
-  order: 2;
-}
-.pliego__panel {
-  position: relative;
-  display: grid;
-  grid-template-rows: auto 1fr auto;
-  gap: 32px;
-  padding: 40px var(--m) 32px;
-}
-.pliego__titulo {
-  font-size: clamp(60px, 7.2vw, 130px);
-  text-wrap: balance;
-}
-.pliego__detalle {
-  align-self: center;
-  justify-self: center;
-  width: min(62%, 380px);
-}
-/* la segunda pieza, entera */
-.pliego__detalle img {
-  width: 100%;
-  height: auto;
-  max-height: 40svh;
-  object-fit: contain;
-}
-.pliego__lead {
-  align-self: center;
-  margin: 0;
-  max-width: 24ch;
-  font-size: clamp(24px, 2.4vw, 38px);
-  line-height: 1.18;
-  letter-spacing: -0.01em;
-}
-.pliego__pie {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 24px;
-  align-items: end;
-  border-top: 2px solid currentColor;
-  padding-top: 12px;
-}
-.pliego__disc {
-  margin: 0;
-}
-/* sin texto al pie (va en el medio): categoría a la izquierda, botón a la derecha */
-.pliego__pie:not(:has(.pliego__texto)) {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-}
-.pliego__texto {
-  margin: 0;
-  font-size: 16px;
-  line-height: 1.4;
-  text-align: right;
-  grid-row: span 2;
-}
-.pliego__ver {
-  justify-self: start;
-  min-height: 44px;
-  padding: 0 18px;
-  border: 0;
-  border-radius: 999px;
-  background: var(--tinta);
-  color: var(--fondo);
-  cursor: pointer;
-  transition: transform 160ms var(--ease-out);
-}
-.pliego__ver:active {
-  transform: scale(0.97);
-}
-@media (max-width: 860px) {
-  .pliego {
-    grid-template-columns: 1fr;
-    grid-template-rows: auto 1fr auto;
-    min-height: 100svh;
-    padding: 72px var(--m) 24px;
-    gap: 20px;
-  }
-  .pliego[data-lado='der'] .pliego__grande {
-    order: 0;
-  }
-  /* el panel se abre: el título va arriba y el pie abajo, la pieza queda en el medio */
-  .pliego__panel {
-    display: contents;
-  }
-  .pliego__titulo {
-    order: -1;
-    font-size: 15vw !important;
-    max-width: none;
-  }
-  .pliego__grande {
-    padding: 20px;
-    min-height: 0;
-  }
-  .pliego__grande img {
-    max-height: 56svh;
-  }
-  .pliego__detalle,
-  .pliego__texto,
-  .pliego__lead {
-    display: none;
-  }
-  .pliego__pie {
-    grid-template-columns: 1fr auto;
-    align-items: center;
-    gap: 12px;
   }
 }
 
@@ -1572,4 +1375,201 @@ figure {
   ::view-transition-new(*) {
     animation: none !important;
   }
+}
+
+/* ---------- Proyectos: coverflow ---------- */
+.carru {
+  position: relative;
+  display: grid;
+  grid-template-rows: auto minmax(0, 1fr) auto;
+  height: 100svh;
+  min-height: 660px;
+  padding: 88px 0 28px;
+  background-color: var(--cherry);
+  color: var(--claro);
+  overflow: hidden;
+  outline: none;
+}
+.carru__cabeza {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  align-items: end;
+  gap: 24px;
+  margin: 0 var(--m);
+  padding-bottom: 12px;
+  border-bottom: 2px solid var(--claro);
+}
+.carru__h {
+  margin: 0;
+  font-weight: 900;
+  font-stretch: 62%;
+  text-transform: uppercase;
+  line-height: 0.82;
+  font-size: clamp(64px, 8vw, 132px);
+}
+.carru__pista {
+  margin: 0;
+  max-width: 30ch;
+  text-align: right;
+  font-weight: 800;
+  font-size: 13px;
+  line-height: 1.25;
+  text-transform: uppercase;
+}
+.carru__escena {
+  position: relative;
+  min-height: 0;
+  perspective: 1600px;
+  transform-style: preserve-3d;
+  cursor: grab;
+  touch-action: pan-y;
+  user-select: none;
+  -webkit-user-select: none;
+}
+.carru__escena:active {
+  cursor: grabbing;
+}
+.carru__pieza {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  height: calc(100% - 40px);
+  max-height: 520px;
+  aspect-ratio: var(--ar);
+  max-width: 78vw;
+  padding: 0;
+  border: 0;
+  background: none;
+  cursor: pointer;
+  will-change: transform;
+  transform-style: preserve-3d;
+}
+.carru__pieza img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  pointer-events: none;
+}
+/* las de los costados se oscurecen hacia el bordó: profundidad sin sombras grises */
+.carru__sombra {
+  position: absolute;
+  inset: 0;
+  background: var(--bordo);
+  opacity: var(--sombra, 0);
+  pointer-events: none;
+}
+.carru__pie {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  align-items: end;
+  gap: 32px;
+  margin: 0 var(--m);
+  padding-top: 14px;
+  border-top: 2px solid var(--claro);
+}
+.carru__info {
+  min-height: 128px;
+}
+.carru__disc {
+  margin: 0 0 6px;
+  font-weight: 800;
+  font-size: 13px;
+  text-transform: uppercase;
+}
+.carru__titulo {
+  margin: 0 0 10px;
+  font-weight: 900;
+  font-stretch: 62%;
+  text-transform: uppercase;
+  line-height: 0.85;
+  font-size: clamp(44px, 4.4vw, 76px);
+}
+.carru__texto {
+  margin: 0;
+  max-width: 56ch;
+  font-size: 16px;
+  line-height: 1.4;
+}
+.carru__controles {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.carru__cuenta {
+  font-weight: 800;
+  font-size: 13px;
+  text-transform: uppercase;
+  margin-right: 8px;
+  white-space: nowrap;
+}
+.carru__flecha {
+  display: grid;
+  place-items: center;
+  width: 48px;
+  height: 48px;
+  border: 2px solid var(--claro);
+  border-radius: 999px;
+  background: transparent;
+  color: var(--claro);
+  cursor: pointer;
+  transition:
+    transform 160ms var(--ease-out),
+    background-color 200ms ease,
+    color 200ms ease;
+}
+.carru__flecha svg {
+  width: 20px;
+  height: 20px;
+}
+.carru__flecha:active {
+  transform: scale(0.94);
+}
+@media (hover: hover) and (pointer: fine) {
+  .carru__flecha:hover {
+    background: var(--claro);
+    color: var(--cherry);
+  }
+}
+@media (max-width: 760px) {
+  .carru {
+    padding-top: 88px;
+  }
+  .carru__cabeza,
+  .carru__pie {
+    grid-template-columns: 1fr;
+  }
+  .carru__pista {
+    text-align: left;
+  }
+  .carru__h {
+    font-size: 21vw;
+  }
+  .carru {
+    min-height: 620px;
+  }
+  .carru__texto {
+    display: none;
+  }
+  .carru__info {
+    min-height: 0;
+  }
+  .carru__titulo {
+    font-size: 13vw;
+  }
+  .carru__controles .btn {
+    margin-left: auto;
+  }
+}
+
+/* ---------- Grano de papel: detrás del contenido, nunca encima de las piezas ---------- */
+.portada,
+.sobre,
+.carru,
+.mazo,
+.disco,
+.fotos__portada,
+.serie,
+.cierre,
+.vista {
+  background-image: url(/tex/grano-b.png);
 }

@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useState } from 'react'
 import Nav from './components/Nav'
 import Hero from './components/Hero'
-import Pliegos from './components/Pliegos'
+import Carrusel from './components/Carrusel'
 import Mazo from './components/Mazo'
 import Disco from './components/Disco'
 import Fotos from './components/Fotos'
@@ -65,7 +65,7 @@ export default function App() {
       <main inert={abierto ? true : undefined}>
         <Hero />
         <Sobre />
-        <Pliegos abrir={abrir} />
+        <Carrusel abrir={abrir} />
         <Mazo abrir={abrir} />
         <Disco abrir={abrir} />
         <Fotos />
