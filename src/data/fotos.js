@@ -33,7 +33,7 @@ export const series = [
     nombre: 'Producto',
     bajada: 'Pink y maquillaje: fondos planos, flores de verdad y el producto en el centro.',
     alt: 'Foto de producto sobre fondo de color con flores',
-    fondo: 'rosa',
+    fondo: 'claro',
     fotos: [
       { src: 'foto-productos-pink-p', w: 1111, h: 1600 },
       { src: 'foto-productos-pink-j', w: 1130, h: 1600 },

@@ -155,8 +155,18 @@ export default function Fotos() {
         </p>
       </header>
 
-      {series.map((s, k) => (
-        <article className="serie" key={s.id} data-fondo={s.fondo} data-lado={k % 2 ? 'der' : 'izq'} aria-labelledby={`serie-${s.id}`}>
+      {series.map((s, k) => {
+        const arriba = k === 0 ? 'claro' : series[k - 1].fondo
+        return (
+        <article
+          className="serie"
+          key={s.id}
+          data-fondo={s.fondo}
+          data-lado={k % 2 ? 'der' : 'izq'}
+          data-costura={arriba !== s.fondo ? '' : undefined}
+          style={{ '--arriba': `var(--${arriba})` }}
+          aria-labelledby={`serie-${s.id}`}
+        >
           <header className="serie__cabeza">
             <h3 className="serie__titulo" id={`serie-${s.id}`} data-reveal>{s.nombre}</h3>
             <p className="serie__bajada" data-reveal style={{ '--i': 1 }}>
@@ -165,9 +175,10 @@ export default function Fotos() {
           </header>
           <Tira s={s} abrir={abrir} />
         </article>
-      ))}
+        )
+      })}
 
-      <article className="serie serie--reels" data-fondo="bordo" aria-labelledby="serie-reels">
+      <article className="serie serie--reels" data-fondo="bordo" data-costura="" style={{ '--arriba': `var(--${series.at(-1).fondo})` }} aria-labelledby="serie-reels">
         <header className="serie__cabeza">
           <h3 className="serie__titulo" id="serie-reels" data-reveal>Reels</h3>
           <p className="serie__bajada" data-reveal style={{ '--i': 1 }}>

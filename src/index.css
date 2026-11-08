@@ -559,8 +559,8 @@ figure {
 
 /* ---------- Mazo de El Principito ---------- */
 .mazo {
-  background: var(--claro);
-  padding: 150px var(--m);
+  background: var(--rosa);
+  padding: 110px var(--m) 140px;
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: 48px;
@@ -824,8 +824,8 @@ figure {
   grid-template-columns: 1fr auto;
   align-items: end;
   gap: 24px;
-  padding: 150px var(--m) 48px;
-  background: var(--rosa);
+  padding: 120px var(--m) 40px;
+  background: var(--claro);
 }
 .fotos__h {
   font-size: clamp(80px, 15vw, 260px);
@@ -1228,7 +1228,7 @@ figure {
     min-height: 0;
   }
   .cierre__invita {
-    font-size: 24vw;
+    font-size: 16.5vw;
   }
   .cierre__links a {
     font-size: 12vw;
@@ -1580,4 +1580,116 @@ figure {
 .cierre,
 .vista {
   background-image: url(/tex/grano-b.png);
+}
+
+/* ---------- Escala única de títulos ---------- */
+.carru__h,
+.fotos__h,
+.sobre__h,
+.mazo__h {
+  font-size: clamp(72px, 9vw, 150px);
+}
+.serie__titulo {
+  font-size: clamp(52px, 6vw, 104px);
+}
+@media (max-width: 760px) {
+  .carru__h,
+  .fotos__h,
+  .sobre__h,
+  .mazo__h {
+    font-size: 19vw;
+  }
+  .serie__titulo {
+    font-size: 15vw;
+  }
+  .tira__cuadro {
+    height: 44svh;
+  }
+}
+
+/* ---------- Cortes entre bloques de color: costura de semitono ----------
+   Donde cambia el color, el de arriba baja hecho puntos que se achican, como en la portada. */
+.carru,
+.disco,
+.serie,
+.cierre {
+  position: relative;
+}
+.carru::before,
+.disco::before,
+.serie[data-costura]::before,
+.cierre::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: -2px;
+  height: 150px;
+  /* mismo color y mismo grano que la sección de arriba, para que no se note el borde */
+  background: url(/tex/grano-b.png), var(--arriba);
+  -webkit-mask: url(/tex/costura.png) repeat-x 0 0 / auto 150px;
+  mask: url(/tex/costura.png) repeat-x 0 0 / auto 150px;
+  pointer-events: none;
+}
+.carru {
+  --arriba: var(--rosa);
+}
+.disco {
+  --arriba: var(--cherry);
+}
+.cierre {
+  --arriba: var(--bordo);
+}
+.disco > *,
+.carru > *,
+.serie > *,
+.cierre > * {
+  position: relative;
+}
+.disco__placa,
+.disco__info {
+  padding-top: 150px;
+  padding-bottom: 56px;
+}
+.fotos__portada {
+  padding-top: 72px;
+}
+.carru {
+  padding-top: 150px;
+}
+.serie[data-costura] {
+  padding-top: 130px;
+}
+.cierre {
+  padding-top: 170px;
+}
+@media (max-width: 760px) {
+  .carru {
+    padding-top: 130px;
+  }
+  .serie[data-costura] {
+    padding-top: 110px;
+  }
+  .disco__placa {
+    padding-top: 130px;
+  }
+  .disco__info {
+    padding-top: 24px;
+  }
+}
+
+/* ---------- Reels: tamaño de celular, no de pantalla completa ---------- */
+.reels {
+  grid-template-columns: repeat(3, minmax(0, 300px));
+  justify-content: start;
+}
+
+/* ---------- Nav sobre secciones oscuras ---------- */
+.nav[data-oscuro='true'] {
+  color: var(--claro);
+  background: rgba(43, 3, 12, 0.5);
+}
+
+.nav[data-oscuro='true']::after {
+  background: var(--claro);
 }
