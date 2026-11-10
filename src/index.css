@@ -238,7 +238,8 @@ figure {
   .nav__links {
     gap: 14px;
   }
-  .nav__links a:first-child {
+  .nav__links a:nth-child(1),
+  .nav__links a:nth-child(3) {
     display: none;
   }
 }
@@ -1729,4 +1730,16 @@ figure {
   .vista__otros {
     grid-template-columns: 1fr;
   }
+}
+
+/* ---------- Auditoría 2 ---------- */
+/* series que entran enteras (no hacen loop): centradas, sin hueco a la derecha */
+.tira[data-loop='false'] {
+  justify-content: center;
+}
+.reels {
+  justify-content: center;
+}
+.mazo {
+  padding-bottom: 96px;
 }

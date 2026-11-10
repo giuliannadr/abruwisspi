@@ -28,6 +28,7 @@ export default function Nav() {
       <a className="nav__marca" href="#inicio" onClick={ir('#inicio')}>Abril Wisspi</a>
       <span className="nav__centro">Diseño gráfico</span>
       <nav className="nav__links" aria-label="Secciones">
+        <a href="#sobre-mi" onClick={ir('#sobre-mi')}>Sobre mí</a>
         <a href="#proyectos" onClick={ir('#proyectos')}>Proyectos</a>
         <a href="#fotografia" onClick={ir('#fotografia')}>Fotografía</a>
         <a href="#contacto" onClick={ir('#contacto')}>Contacto</a>
