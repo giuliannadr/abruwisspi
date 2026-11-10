@@ -6,11 +6,17 @@ import { transicion, getLenis, reduce } from '../lib/motion'
 // Fotografía separada en proyectos: cada serie con su título, su bajada y su tira.
 // Al tocar una foto, viaja al visor (elemento compartido).
 
-// Reproduce el video solo mientras se ve (ahorra decodificar tres videos todo el tiempo).
+// Los reels no bajan nada hasta que están cerca (ni la imagen de portada) y solo se reproducen mientras se ven.
 const vistos = new WeakSet()
 function verEnPantalla(v) {
   if (!v || vistos.has(v)) return
   vistos.add(v)
+  new IntersectionObserver(([e], io) => {
+    if (!e.isIntersecting) return
+    v.poster = v.dataset.poster
+    v.src = v.dataset.src
+    io.disconnect()
+  }, { rootMargin: '900px' }).observe(v)
   new IntersectionObserver(([e]) => (e.isIntersecting ? v.play().catch(() => {}) : v.pause()), { rootMargin: '100px' }).observe(v)
 }
 
@@ -106,7 +112,7 @@ function Tira({ s, abrir }) {
           <button
             className="tira__cuadro"
             key={k}
-            data-reveal={copia ? undefined : ''}
+            data-cortina={copia ? undefined : ''}
             style={{ '--i': Math.min(i, 5) }}
             tabIndex={copia ? -1 : 0}
             aria-hidden={copia || undefined}
@@ -149,7 +155,7 @@ export default function Fotos() {
   return (
     <section className="fotos" id="fotografia" aria-labelledby="fotos-h">
       <header className="fotos__portada">
-        <h2 className="fotos__h" id="fotos-h" data-reveal>Fotografía</h2>
+        <h2 className="fotos__h" id="fotos-h" data-titulo><span>Fotografía</span></h2>
         <p className="fotos__cuenta" data-reveal style={{ '--i': 1 }}>
           ({series.length + 1}) series: books, estudio, producto, repostería y reels
         </p>
@@ -168,7 +174,7 @@ export default function Fotos() {
           aria-labelledby={`serie-${s.id}`}
         >
           <header className="serie__cabeza">
-            <h3 className="serie__titulo" id={`serie-${s.id}`} data-reveal>{s.nombre}</h3>
+            <h3 className="serie__titulo" id={`serie-${s.id}`} data-titulo data-deriva={k % 2 ? 1 : -1}><span>{s.nombre}</span></h3>
             <p className="serie__bajada" data-reveal style={{ '--i': 1 }}>
               <b>({s.fotos.length})</b> {s.bajada}
             </p>
@@ -180,7 +186,7 @@ export default function Fotos() {
 
       <article className="serie serie--reels" data-fondo="bordo" data-costura="" style={{ '--arriba': `var(--${series.at(-1).fondo})` }} aria-labelledby="serie-reels">
         <header className="serie__cabeza">
-          <h3 className="serie__titulo" id="serie-reels" data-reveal>Reels</h3>
+          <h3 className="serie__titulo" id="serie-reels" data-titulo data-deriva="-1"><span>Reels</span></h3>
           <p className="serie__bajada" data-reveal style={{ '--i': 1 }}>
             <b>({reels.length})</b> Reels para una repostería, sin sonido.
           </p>
@@ -188,7 +194,7 @@ export default function Fotos() {
         <div className="reels">
           {reels.map((r, i) => (
             <figure className="reel" key={r.id} data-reveal style={{ '--i': i }}>
-              <video ref={verEnPantalla} src={`/video/${r.id}.mp4`} poster={`/video/${r.id}.jpg`} muted loop playsInline preload="metadata" width="540" height="960" aria-label={r.alt} />
+              <video ref={verEnPantalla} data-src={`/video/${r.id}.mp4`} data-poster={`/video/${r.id}.jpg`} muted loop playsInline preload="metadata" width="540" height="960" aria-label={r.alt} />
               <figcaption>{r.titulo}</figcaption>
             </figure>
           ))}

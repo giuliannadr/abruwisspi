@@ -6,13 +6,9 @@ import { series } from '../data/fotos'
 export default function Sobre() {
   return (
     <section className="sobre" id="sobre-mi" aria-labelledby="sobre-h">
-      <div className="sobre__foto" aria-hidden="true">
-        <div className="sobre__foto-papel" />
-        <div className="sobre__foto-fluo" />
-        <div className="sobre__foto-tinta" />
-      </div>
+      <img className="sobre__foto" data-entra="sube" src="/tex/abril-sobre.png" width="819" height="1100" alt="" aria-hidden="true" loading="lazy" decoding="async" />
       <div className="sobre__texto">
-        <h2 className="sobre__h" id="sobre-h" data-reveal>Sobre mí</h2>
+        <h2 className="sobre__h" id="sobre-h" data-titulo><span>Sobre mí</span></h2>
         <p className="sobre__bio" data-reveal style={{ '--i': 1 }}>
           Soy Abril y estudio diseño gráfico. Hago afiches de cine, packaging, folletos y portadas de disco, y me gusta sacar mis propias fotos: books, producto y repostería.
         </p>

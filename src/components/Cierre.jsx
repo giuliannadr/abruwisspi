@@ -43,7 +43,7 @@ export default function Cierre() {
   return (
     <footer className="cierre" id="contacto">
       <div className="cierre__texto">
-        <h2 className="cierre__invita" data-reveal>¿Hablamos?</h2>
+        <h2 className="cierre__invita" data-titulo><span>¿Hablamos?</span></h2>
         <p className="cierre__bajada" data-reveal style={{ '--i': 1 }}>
           Para proyectos o para charlar de diseño.
         </p>
@@ -62,10 +62,9 @@ export default function Cierre() {
           <span>Diseño gráfico y fotografía</span>
         </div>
       </div>
-      <div className="cierre__abril" aria-hidden="true">
-        <div className="cierre__abril-papel" />
+      <div className="cierre__abril" aria-hidden="true" data-entra="sube">
+        <img className="cierre__abril-base" src="/tex/abril-cierre.png" width="785" height="1333" alt="" loading="lazy" decoding="async" />
         <div className="cierre__abril-fluo" ref={fluo} />
-        <div className="cierre__abril-tinta" />
       </div>
     </footer>
   )

@@ -9,7 +9,7 @@ import Sobre from './components/Sobre'
 import Cierre from './components/Cierre'
 import Vista from './components/Vista'
 import { porId } from './data/proyectos'
-import { startLenis, getLenis, observeReveals, transicion } from './lib/motion'
+import { startLenis, getLenis, observeReveals, transicion, derivas } from './lib/motion'
 
 const idDelHash = () => {
   const m = location.hash.match(/^#\/p\/([\w-]+)/)
@@ -28,7 +28,9 @@ export default function App() {
 
   useEffect(() => {
     startLenis()
-    return observeReveals()
+    const fuera = observeReveals()
+    const sinDerivas = derivas()
+    return () => { fuera(); sinDerivas() }
   }, [])
 
   useEffect(() => {

@@ -144,13 +144,13 @@ export default function Carrusel({ abrir }) {
       }}
     >
       <header className="carru__cabeza">
-        <h2 className="carru__h" id="carru-h" data-reveal>Proyectos</h2>
+        <h2 className="carru__h" id="carru-h" data-titulo><span>Proyectos</span></h2>
         <p className="carru__pista" data-reveal style={{ '--i': 1 }}>
           <b>({N})</b> Afiches, folletos, gráfica de gira, retícula y un vinilo. Arrastrá o usá las flechas.
         </p>
       </header>
 
-      <div className="carru__escena">
+      <div className="carru__escena" data-entra="abre">
         {lista.map((x, i) => {
           const f = x.piezas[0]
           const centro = i === activo

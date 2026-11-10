@@ -23,7 +23,7 @@ export default function Mazo({ abrir }) {
   return (
     <section className="mazo" id="cartas" aria-labelledby="mazo-h">
       <div className="mazo__texto">
-        <h2 className="mazo__h" id="mazo-h" data-reveal>El Principito</h2>
+        <h2 className="mazo__h" id="mazo-h" data-titulo><span>El Principito</span></h2>
         <p data-reveal style={{ '--i': 1 }}>
           Cartas y caja. Un mazo coleccionable con los personajes de los planetas. Cada carta trae su frase y tres palabras que lo describen, y el dorso es su objeto: el farol, la galera, el mundo.
         </p>
@@ -38,7 +38,7 @@ export default function Mazo({ abrir }) {
         </div>
       </div>
 
-      <div className="mazo__mesa" data-reveal style={{ '--i': 1 }}>
+      <div className="mazo__mesa" data-entra="reparte">
         {orden.map((id, i) => {
           const c = cartas.find((x) => x.id === id)
           const top = id === arriba

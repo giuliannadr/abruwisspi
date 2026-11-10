@@ -329,36 +329,11 @@ figure {
   aspect-ratio: 691 / 1088;
   pointer-events: none;
 }
-.portada__abril > div,
-.sobre__foto > div {
+.cierre__abril > .cierre__abril-fluo {
   position: absolute;
   inset: 0;
   -webkit-mask: var(--mk) center / 100% 100% no-repeat;
   mask: var(--mk) center / 100% 100% no-repeat;
-}
-.portada__abril-papel {
-  --mk: url(/tex/abril-sentada-papel.png);
-  background: var(--claro);
-}
-/* foto teñida debajo de los puntos, suave: se ve más la cara sin perder la trama */
-.portada__abril > .portada__abril-foto {
-  -webkit-mask: none;
-  mask: none;
-  background: url(/tex/abril-sentada-tono.webp) center / 100% 100% no-repeat;
-  opacity: 0.42;
-}
-.portada__abril-fluo {
-  --mk: url(/tex/abril-sentada-ht.png);
-  background: var(--fluo);
-  transform: translate(8px, -5px);
-  mix-blend-mode: multiply;
-  opacity: 0.72;
-}
-.portada__abril-tinta {
-  --mk: url(/tex/abril-sentada-ht.png);
-  background: var(--cherry);
-  mix-blend-mode: multiply;
-  opacity: 0.9;
 }
 .portada__bajada {
   position: absolute;
@@ -1049,22 +1024,6 @@ figure {
   aspect-ratio: 1066 / 1431;
   justify-self: center;
 }
-.sobre__foto-papel {
-  --mk: url(/tex/abril-medio.png);
-  background: var(--claro);
-}
-.sobre__foto-fluo {
-  --mk: url(/tex/abril-medio-ht.png);
-  background: var(--fluo);
-  transform: translate(9px, -5px);
-  mix-blend-mode: multiply;
-  opacity: 0.9;
-}
-.sobre__foto-tinta {
-  --mk: url(/tex/abril-medio-ht.png);
-  background: var(--cherry);
-  mix-blend-mode: multiply;
-}
 .sobre__texto {
   padding-bottom: 120px;
 }
@@ -1206,21 +1165,13 @@ figure {
   -webkit-mask: var(--mk) center / 100% 100% no-repeat;
   mask: var(--mk) center / 100% 100% no-repeat;
 }
-.cierre__abril-papel {
-  --mk: url(/tex/abril-cuerpo-papel.png);
-  background: var(--claro);
-}
 .cierre__abril-fluo {
-  --mk: url(/tex/abril-cuerpo-ht.png);
+  /* la máscara se pide recién cuando la contratapa está por verse (data-in) */
+  --mk: none;
   background: var(--fluo);
   transform: translate(10px, -6px);
   mix-blend-mode: multiply;
   opacity: 0.9;
-}
-.cierre__abril-tinta {
-  --mk: url(/tex/abril-cuerpo-ht.png);
-  background: var(--bordo);
-  mix-blend-mode: multiply;
 }
 @media (max-width: 860px) {
   .cierre {
@@ -1580,7 +1531,7 @@ figure {
 .serie,
 .cierre,
 .vista {
-  background-image: url(/tex/grano-b.png);
+  background-image: url(/tex/grano.webp);
 }
 
 /* ---------- Escala única de títulos ---------- */
@@ -1627,7 +1578,7 @@ figure {
   top: -2px;
   height: 36px;
   /* borde sutil: mismo color y grano que la sección de arriba, puntos chicos que se apagan rápido */
-  background: url(/tex/grano-b.png), var(--arriba);
+  background: url(/tex/grano.webp), var(--arriba);
   -webkit-mask: url(/tex/costura.png) repeat-x 0 0 / auto 36px;
   mask: url(/tex/costura.png) repeat-x 0 0 / auto 36px;
   pointer-events: none;
@@ -1742,4 +1693,88 @@ figure {
 }
 .mazo {
   padding-bottom: 96px;
+}
+
+/* ---------- Abril impresa en una sola imagen (sin capas en multiply: más liviano al scrollear) ---------- */
+img.portada__abril,
+img.sobre__foto {
+  object-fit: contain;
+}
+.cierre__abril-base {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+}
+
+/* ---------- Efectos de scroll (solo transform, opacity y clip-path) ---------- */
+/* títulos: el texto sube desde su propia línea */
+.js [data-titulo] {
+  overflow: hidden;
+  padding-top: 0.14em;
+  margin-top: -0.14em;
+}
+.js [data-titulo] > span {
+  display: inline-block;
+  transform: translateY(105%);
+  transition: transform 1000ms var(--ease-out);
+}
+.js [data-titulo][data-in='true'] > span {
+  transform: none;
+}
+/* fotos: se descubren como una cortina, una detrás de otra */
+.js [data-cortina] {
+  clip-path: inset(100% 0 0 0);
+  transition: clip-path 1000ms var(--ease-out);
+  transition-delay: calc(var(--i, 0) * 80ms);
+}
+.js [data-cortina] img {
+  scale: 1.12;
+  transition: scale 1400ms var(--ease-out);
+  transition-delay: calc(var(--i, 0) * 80ms);
+}
+.js [data-cortina][data-in='true'] {
+  clip-path: inset(0 0 0 0);
+}
+.js [data-cortina][data-in='true'] img {
+  scale: 1;
+}
+/* entradas con personalidad */
+.js [data-entra] {
+  transition:
+    opacity 900ms var(--ease-out),
+    transform 1100ms var(--ease-out);
+}
+.js [data-entra='sube'] {
+  opacity: 0;
+  transform: translateY(80px);
+}
+.js [data-entra='abre'] {
+  opacity: 0;
+  transform: scale(0.88);
+}
+.js [data-entra='reparte'] {
+  opacity: 0;
+  transform: translateY(140px) rotate(8deg);
+}
+.js [data-entra][data-in='true'] {
+  opacity: 1;
+  transform: none;
+}
+@media (prefers-reduced-motion: reduce) {
+  .js [data-titulo] > span,
+  .js [data-entra] {
+    transform: none;
+    opacity: 1;
+  }
+  .js [data-cortina] {
+    clip-path: none;
+  }
+  .js [data-cortina] img {
+    scale: 1;
+  }
+}
+
+.cierre__abril[data-in='true'] .cierre__abril-fluo {
+  --mk: url(/tex/abril-cierre-ht.webp);
 }

@@ -47,7 +47,6 @@ export default function Hero() {
       const tl = gsap.timeline({ defaults: { ease: 'expo.out' } })
       tl.from('.portada__linea > span', { yPercent: 100, duration: 1.2, stagger: 0.12 })
         .from('.portada__abril', { y: 60, opacity: 0, duration: 1.3 }, 0.1)
-        .from('.portada__abril-fluo', { x: 0, y: 0, duration: 1.4, ease: 'power3.out' }, 0.5)
         .from('.portada__pieza', { opacity: 0, scale: 0.9, duration: 0.9, stagger: { each: 0.04, from: 'random' } }, 0.2)
         .from('.portada__bajada', { opacity: 0, y: 12, duration: 0.7, stagger: 0.08 }, 0.7)
       gsap.to('.portada__abril', {
@@ -65,7 +64,7 @@ export default function Hero() {
       <div className="portada__mesa" ref={mesa}>
         {piezasMesa.map(([src, t, w, x, y, r]) => (
           <figure className="portada__pieza" key={src} style={{ left: x, top: y, width: w, rotate: `${r}deg` }}>
-            <img src={img(src, 'sm')} alt="" draggable="false" loading="eager" />
+            <img src={img(src, 'xs')} alt="" draggable="false" decoding="async" />
             <figcaption>{t}</figcaption>
           </figure>
         ))}
@@ -77,12 +76,8 @@ export default function Hero() {
         <span className="portada__linea portada__linea--b"><span>{site.apellido}</span></span>
       </h1>
 
-      <div className="portada__abril" aria-hidden="true">
-        <div className="portada__abril-papel" />
-        <div className="portada__abril-foto" />
-        <div className="portada__abril-fluo" />
-        <div className="portada__abril-tinta" />
-      </div>
+      {/* Abril ya "impresa": papel, foto teñida y dos tintas en una sola imagen (ver public/tex) */}
+      <img className="portada__abril" src="/tex/abril-portada.png" width="691" height="1088" alt="" aria-hidden="true" fetchPriority="high" decoding="async" />
 
       <p className="portada__rol">{site.rol}</p>
       <p className="portada__bajada portada__bajada--izq">

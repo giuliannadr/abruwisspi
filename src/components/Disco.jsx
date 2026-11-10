@@ -44,7 +44,7 @@ export default function Disco({ abrir }) {
                 <circle key={r} cx="50" cy="50" r={r} fill="none" stroke="#3a0a16" strokeWidth="0.35" />
               ))}
             </svg>
-            <img className="disco__etiqueta" src={img(d.src, 'sm')} style={{ objectPosition: d.pos }} alt="" />
+            <img className="disco__etiqueta" loading="lazy" decoding="async" src={img(d.src, 'sm')} style={{ objectPosition: d.pos }} alt="" />
           </div>
           <div className="disco__cuadro">
             <AnimatePresence initial={false}>
@@ -54,6 +54,8 @@ export default function Disco({ abrir }) {
                 srcSet={`${img(d.src, 'sm')} 1000w, ${img(d.src)} 2000w`}
                 sizes="(max-width: 860px) 92vw, 46vw"
                 alt={p.piezas[0].alt}
+                loading="lazy"
+                decoding="async"
                 data-pieza={d.id}
                 style={{ objectPosition: d.pos }}
                 initial={{ opacity: 0, scale: 1.06 }}

@@ -25,7 +25,7 @@ export function scrollTo(target) {
 
 // Entradas: cada [data-reveal] sube y aparece una vez cuando entra en pantalla.
 export function observeReveals(root = document) {
-  const els = root.querySelectorAll('[data-reveal]:not([data-in])')
+  const els = root.querySelectorAll(':is([data-reveal], [data-titulo], [data-cortina], [data-entra]):not([data-in])')
   const io = new IntersectionObserver(
     (entries) => {
       for (const e of entries) {
@@ -56,6 +56,22 @@ export function observeReveals(root = document) {
     io.disconnect()
     removeEventListener('scroll', onScroll)
   }
+}
+
+// Títulos que se corren un poco de costado con el scroll (data-deriva = 1 o -1).
+export function derivas() {
+  if (reduce()) return () => {}
+  const ctx = gsap.context(() => {
+    gsap.utils.toArray('[data-deriva]').forEach((el) => {
+      const dir = Number(el.dataset.deriva) || 1
+      gsap.fromTo(el, { x: -40 * dir }, {
+        x: 40 * dir,
+        ease: 'none',
+        scrollTrigger: { trigger: el, start: 'top bottom', end: 'bottom top', scrub: 0.4 },
+      })
+    })
+  })
+  return () => ctx.revert()
 }
 
 // Transición entre vistas con elemento compartido (View Transitions API).
