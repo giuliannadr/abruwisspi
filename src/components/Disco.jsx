@@ -1,4 +1,4 @@
-import { useLayoutEffect, useRef, useState } from 'react'
+import { useEffect, useLayoutEffect, useRef, useState } from 'react'
 import { AnimatePresence, motion } from 'motion/react'
 import { gsap } from 'gsap'
 import { porId } from '../data/proyectos'
@@ -33,18 +33,86 @@ export default function Disco({ abrir }) {
     return () => ctx.revert()
   }, [])
 
+  // El disco también se agarra: se tira de él para sacarlo o guardarlo y rueda mientras se mueve.
+  // Al soltarlo sigue un poco por la inercia. El scroll y la mano se suman (el scroll mueve el
+  // contenedor y la mano el disco de adentro), sin pisarse.
+  useEffect(() => {
+    const mano = ref.current?.querySelector('.disco__mano')
+    const vinilo = ref.current?.querySelector('.disco__vinilo')
+    const giro = ref.current?.querySelector('.disco__giro')
+    if (!mano || !vinilo || !giro) return
+    const setX = gsap.quickSetter(mano, 'x', 'px')
+    const setR = gsap.quickSetter(giro, 'rotate', 'deg')
+    let x = 0, r = 0, vel = 0, x0 = 0, xIni = 0, ultX = 0, ultT = 0, id = null, raf = 0
+    const ancho = () => mano.offsetWidth
+    // lo que corrió el scroll, para que el disco nunca entre más que la funda ni salga del todo
+    const corrido = () => (gsap.getProperty(vinilo, 'xPercent') / 100) * ancho()
+    // siempre queda un borde afuera para poder volver a agarrarlo
+    const limitar = (v) => Math.max(Math.min(0, ancho() * 0.16 - corrido()), Math.min(ancho() * 0.62 - corrido(), v))
+    const pintar = (nx) => {
+      const lim = limitar(nx)
+      r += ((lim - x) / (ancho() / 2)) * (180 / Math.PI) // rueda sin patinar
+      x = lim
+      setX(x); setR(r)
+    }
+    const inercia = () => {
+      vel *= 0.92
+      if (Math.abs(vel) < 0.02) { mano.classList.remove('es-suelto'); return }
+      pintar(x + vel * 16)
+      raf = requestAnimationFrame(inercia)
+    }
+    const down = (e) => {
+      if (e.button > 0) return
+      e.preventDefault() // que arrastrar no seleccione texto
+      cancelAnimationFrame(raf)
+      id = e.pointerId
+      mano.setPointerCapture(id)
+      mano.classList.add('es-agarrado')
+      x0 = ultX = e.clientX; xIni = x; ultT = performance.now(); vel = 0
+    }
+    const move = (e) => {
+      if (e.pointerId !== id) return
+      const t = performance.now()
+      vel = (e.clientX - ultX) / Math.max(1, t - ultT)
+      ultX = e.clientX; ultT = t
+      pintar(xIni + e.clientX - x0)
+    }
+    const up = (e) => {
+      if (e.pointerId !== id) return
+      id = null
+      mano.classList.remove('es-agarrado')
+      if (performance.now() - ultT > 80) vel = 0 // lo soltó quieto
+      if (!reduce()) { mano.classList.add('es-suelto'); raf = requestAnimationFrame(inercia) }
+    }
+    mano.addEventListener('pointerdown', down)
+    mano.addEventListener('pointermove', move)
+    mano.addEventListener('pointerup', up)
+    mano.addEventListener('pointercancel', up)
+    return () => {
+      cancelAnimationFrame(raf)
+      mano.removeEventListener('pointerdown', down)
+      mano.removeEventListener('pointermove', move)
+      mano.removeEventListener('pointerup', up)
+      mano.removeEventListener('pointercancel', up)
+    }
+  }, [])
+
   return (
     <section className="disco" ref={ref} aria-labelledby="disco-h" data-oscuro>
       <div className="disco__placa">
         <div className="disco__funda-wrap" data-reveal>
-          <div className="disco__vinilo" aria-hidden="true">
+          <div className="disco__mano" aria-hidden="true">
+          <div className="disco__vinilo">
+            <div className="disco__giro">
             <svg viewBox="0 0 100 100">
               <circle cx="50" cy="50" r="49.5" fill="#160207" />
               {[46, 42, 38.5, 35, 31.5, 28, 25].map((r) => (
                 <circle key={r} cx="50" cy="50" r={r} fill="none" stroke="#3a0a16" strokeWidth="0.35" />
               ))}
             </svg>
-            <img className="disco__etiqueta" loading="lazy" decoding="async" src={img(d.src, 'sm')} style={{ objectPosition: d.pos }} alt="" />
+            <img className="disco__etiqueta" loading="lazy" decoding="async" src={img(d.src, 'sm')} style={{ objectPosition: d.pos }} alt="" draggable="false" />
+            </div>
+          </div>
           </div>
           <div className="disco__cuadro">
             <AnimatePresence initial={false}>

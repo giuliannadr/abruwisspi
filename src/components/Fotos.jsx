@@ -48,7 +48,7 @@ function Tira({ s, abrir }) {
     io.observe(el)
     const pausa = (ms) => { quieto = performance.now() + ms }
     const toque = () => pausa(1e9) // quieta mientras la tengan agarrada
-    const suelta = () => { if (quieto > performance.now() + 5000) pausa(1500) }
+    const suelta = () => { if (quieto > performance.now() + 5000) pausa(2500) } // deja terminar la inercia
     addEventListener('pointerup', suelta)
     addEventListener('pointercancel', suelta)
     // la rueda vertical (scrollear la página) no la frena; solo el gesto de costado
@@ -75,28 +75,60 @@ function Tira({ s, abrir }) {
     }
   }, [loop])
 
-  // Arrastrar la tira con el mouse (en táctil ya se desliza sola).
+  // Arrastrar la tira con el mouse (en táctil ya se desliza sola). Al soltar sigue con la inercia del gesto.
   useEffect(() => {
     const el = ref.current
     if (!el || !matchMedia('(pointer: fine)').matches) return
-    let x0 = 0, s0 = 0, abajo = false, movido = false
-    const down = (e) => { abajo = true; movido = false; x0 = e.clientX; s0 = el.scrollLeft }
+    let x0 = 0, s0 = 0, abajo = false, movido = false // s0 cambia al dar la vuelta
+    let vel = 0, ultX = 0, ultT = 0, raf = 0
+    // en loop, al pasar el borde salta a la otra vuelta (es la misma foto)
+    const ubicar = (x) => {
+      if (el.dataset.loop === 'true') {
+        const mitad = el.scrollWidth / 2
+        if (x >= mitad) { x -= mitad; s0 -= mitad }
+        else if (x < 0) { x += mitad; s0 += mitad }
+      }
+      el.scrollLeft = x
+    }
+    const inercia = () => {
+      vel *= 0.94
+      if (Math.abs(vel) < 0.02) return
+      ubicar(el.scrollLeft - vel * 16)
+      raf = requestAnimationFrame(inercia)
+    }
+    const down = (e) => {
+      if (e.button > 0) return
+      cancelAnimationFrame(raf)
+      abajo = true; movido = false; x0 = ultX = e.clientX; ultT = performance.now(); vel = 0; s0 = el.scrollLeft
+    }
     const move = (e) => {
       if (!abajo) return
       const dx = e.clientX - x0
-      if (Math.abs(dx) > 4) movido = true
-      el.scrollLeft = s0 - dx
+      if (!movido && Math.abs(dx) > 4) { movido = true; el.dataset.arrastrando = '' }
+      const t = performance.now()
+      vel = (e.clientX - ultX) / Math.max(1, t - ultT); ultX = e.clientX; ultT = t
+      ubicar(s0 - dx)
     }
-    const up = () => { abajo = false }
+    const up = () => {
+      if (!abajo) return
+      abajo = false
+      delete el.dataset.arrastrando
+      if (!movido) return
+      if (performance.now() - ultT > 80) vel = 0 // la soltó quieta
+      if (!reduce()) raf = requestAnimationFrame(inercia)
+    }
     const click = (e) => { if (movido) { e.stopPropagation(); e.preventDefault() } }
     el.addEventListener('pointerdown', down)
     addEventListener('pointermove', move)
     addEventListener('pointerup', up)
+    addEventListener('pointercancel', up)
     el.addEventListener('click', click, true)
     return () => {
+      cancelAnimationFrame(raf)
       el.removeEventListener('pointerdown', down)
       removeEventListener('pointermove', move)
       removeEventListener('pointerup', up)
+      removeEventListener('pointercancel', up)
       el.removeEventListener('click', click, true)
     }
   }, [])

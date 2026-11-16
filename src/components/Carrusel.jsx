@@ -10,6 +10,14 @@ import { reduce } from '../lib/motion'
 const lista = destacados.map((id) => porId[id])
 const N = lista.length
 const envolver = (d) => ((((d + N / 2) % N) + N) % N) - N / 2 // distancia más corta en el loop
+// separación entre piezas: en compu, media pieza vertical (la del centro ocupa casi todo el alto
+// y las vecinas quedan dentro de su columna); en celu, según el ancho de la pantalla.
+const pasoDe = (escena) => {
+  if (innerWidth < 760) return innerWidth * 0.56
+  // ancho de una pieza vertical (como en el CSS: alto disponible, con tope de ancho por pantalla)
+  const ancho = Math.min((escena?.clientHeight ?? 600) * 0.707, innerWidth * (innerWidth < 1024 ? 0.6 : 0.48))
+  return Math.max(200, ancho * 0.5)
+}
 
 function Flecha({ dir }) {
   return (
@@ -31,8 +39,7 @@ export default function Carrusel({ abrir }) {
   // Pinta cada pieza según su distancia al centro (sin re-render de React por cuadro).
   useEffect(() => {
     const pintar = (p) => {
-      const ancho = innerWidth
-      const paso = ancho < 760 ? ancho * 0.56 : Math.min(ancho * 0.21, 330)
+      const paso = pasoDe(ref.current?.querySelector('.carru__escena'))
       cartas.current.forEach((el, i) => {
         if (!el) return
         const d = envolver(i - p)
@@ -72,7 +79,7 @@ export default function Carrusel({ abrir }) {
     const el = ref.current?.querySelector('.carru__escena')
     if (!el) return
     let x0 = 0, p0 = 0, lastX = 0, lastT = 0, vel = 0, activoDrag = false, movido = false, id = null
-    const paso = () => (innerWidth < 760 ? innerWidth * 0.56 : Math.min(innerWidth * 0.21, 330))
+    const paso = () => pasoDe(el)
     const down = (e) => {
       if (e.button > 0) return
       activoDrag = true; movido = false; id = e.pointerId; tocando.current = true

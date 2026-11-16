@@ -25,29 +25,28 @@ export function scrollTo(target) {
 
 // Entradas: cada [data-reveal] sube y aparece una vez cuando entra en pantalla.
 export function observeReveals(root = document) {
-  const els = root.querySelectorAll(':is([data-reveal], [data-titulo], [data-cortina], [data-entra]):not([data-in])')
+  const pendientes = new Set(root.querySelectorAll(':is([data-reveal], [data-titulo], [data-cortina], [data-entra]):not([data-in])'))
+  const entrar = (el) => {
+    el.dataset.in = 'true'
+    io.unobserve(el)
+    pendientes.delete(el)
+    // terminada la cortina, se saca el recorte: si queda puesto, cada foto es una capa aparte
+    // y las tiras que se mueven solas obligan a recomponerlas en cada cuadro
+    if ('cortina' in el.dataset) setTimeout(() => { el.dataset.listo = '' }, 1600 + (Number(getComputedStyle(el).getPropertyValue('--i')) || 0) * 80)
+  }
   const io = new IntersectionObserver(
     (entries) => {
-      for (const e of entries) {
-        if (e.isIntersecting) {
-          e.target.dataset.in = 'true'
-          io.unobserve(e.target)
-        }
-      }
+      for (const e of entries) if (e.isIntersecting) entrar(e.target)
     },
     { rootMargin: '0px 0px -12% 0px' },
   )
-  els.forEach((el) => io.observe(el))
+  pendientes.forEach((el) => io.observe(el))
   // Si la página salta (un link, recargar a mitad de página), lo que quedó arriba también aparece.
   let raf = 0
   const barrer = () => {
     raf = 0
-    for (const el of els) {
-      if (!el.dataset.in && el.getBoundingClientRect().top < innerHeight) {
-        el.dataset.in = 'true'
-        io.unobserve(el)
-      }
-    }
+    for (const el of pendientes) if (el.getBoundingClientRect().top < innerHeight) entrar(el)
+    if (!pendientes.size) removeEventListener('scroll', onScroll)
   }
   const onScroll = () => { if (!raf) raf = requestAnimationFrame(barrer) }
   addEventListener('scroll', onScroll, { passive: true })
@@ -64,8 +63,11 @@ export function derivas() {
   const ctx = gsap.context(() => {
     gsap.utils.toArray('[data-deriva]').forEach((el) => {
       const dir = Number(el.dataset.deriva) || 1
-      gsap.fromTo(el, { x: -40 * dir }, {
-        x: 40 * dir,
+      // en celu el título ya ocupa casi todo el ancho: se corre apenas
+      const amp = () => (innerWidth < 760 ? 10 : 40)
+      gsap.fromTo(el, { x: () => -amp() * dir }, {
+        x: () => amp() * dir,
+        invalidateOnRefresh: true,
         ease: 'none',
         scrollTrigger: { trigger: el, start: 'top bottom', end: 'bottom top', scrub: 0.4 },
       })

@@ -8,14 +8,23 @@ export default function Nav() {
   const [oscuro, setOscuro] = useState(false)
 
   useEffect(() => {
+    // aparece pasada la portada (una sola medición por cuadro, no por evento)
+    let raf = 0
     const onScroll = () => {
-      setOn(window.scrollY > innerHeight * 0.65)
-      const el = document.elementFromPoint(innerWidth / 2, 70)
-      setOscuro(!!el?.closest('.carru, .cierre, .serie[data-fondo="cherry"], .serie[data-fondo="bordo"]'))
+      if (raf) return
+      raf = requestAnimationFrame(() => { raf = 0; setOn(window.scrollY > innerHeight * 0.65) })
     }
     onScroll()
     addEventListener('scroll', onScroll, { passive: true })
-    return () => removeEventListener('scroll', onScroll)
+    // fondo oscuro: una franja de 1 px a la altura del nav avisa qué sección pasa por debajo
+    const debajo = new Set()
+    const evaluar = () => setOscuro(debajo.size > 0)
+    const io = new IntersectionObserver((entries) => {
+      for (const e of entries) e.isIntersecting ? debajo.add(e.target) : debajo.delete(e.target)
+      evaluar()
+    }, { rootMargin: `-70px 0px -${Math.max(0, innerHeight - 71)}px 0px` })
+    document.querySelectorAll('.carru, .cierre, .serie[data-fondo="cherry"], .serie[data-fondo="bordo"]').forEach((el) => io.observe(el))
+    return () => { cancelAnimationFrame(raf); removeEventListener('scroll', onScroll); io.disconnect() }
   }, [])
 
   const ir = (id) => (e) => {

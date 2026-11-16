@@ -662,12 +662,28 @@ figure {
   height: 100%;
   object-fit: cover;
 }
-.disco__vinilo {
+.disco__mano {
   position: absolute;
   inset: 2%;
   z-index: 0;
   border-radius: 50%;
+  cursor: grab;
+  touch-action: pan-y; /* en celu el gesto vertical sigue scrolleando */
   will-change: transform;
+}
+.disco__mano.es-agarrado {
+  cursor: grabbing;
+}
+.disco__vinilo,
+.disco__giro {
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  will-change: transform;
+}
+.disco__giro img {
+  pointer-events: none;
+  user-select: none;
 }
 .disco__vinilo svg {
   width: 100%;
@@ -1777,4 +1793,148 @@ img.sobre__foto {
 
 .cierre__abril[data-in='true'] .cierre__abril-fluo {
   --mk: url(/tex/abril-cierre-ht.webp);
+}
+
+/* ---------- Correcciones 15/11 ---------- */
+/* portada: las piezas de fondo en blanco y negro, para que ella sea lo único con color */
+.portada__pieza img {
+  filter: grayscale(1) contrast(1.06);
+}
+.tira[data-arrastrando] {
+  cursor: grabbing;
+}
+.tira[data-arrastrando] .tira__cuadro {
+  cursor: grabbing;
+}
+/* cortina terminada: sin recorte ni escala (cada foto vuelve a pintarse con su tira, sin capa propia) */
+.js [data-cortina][data-listo] {
+  clip-path: none;
+  transition: none;
+}
+.js [data-cortina][data-listo] img {
+  scale: none;
+  transition: none;
+}
+
+/* sin scroll horizontal: los títulos que derivan no empujan el ancho de la página */
+.fotos,
+.serie,
+.mazo {
+  overflow-x: clip;
+}
+/* ¿Hablamos? entra entero en su columna */
+.cierre__invita {
+  font-size: clamp(72px, 8.4vw, 170px);
+}
+@media (max-width: 760px) {
+  .cierre__invita {
+    font-size: 16.5vw;
+  }
+}
+@media (max-width: 420px) {
+  .nav__links {
+    gap: 12px;
+  }
+  .nav__links a,
+  .nav__marca {
+    font-size: 11px;
+  }
+}
+
+
+/* ---------- Proyectos: el afiche manda ----------
+   Título e info en una columna angosta a la izquierda; el carrusel ocupa el resto y casi todo el alto. */
+@media (min-width: 1024px) {
+  .carru {
+    grid-template-columns: minmax(300px, 27%) minmax(0, 1fr);
+    grid-template-rows: auto minmax(0, 1fr);
+    min-height: 620px;
+    padding: 92px 0 32px;
+  }
+  .carru__cabeza {
+    grid-column: 1;
+    grid-row: 1;
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 14px;
+    margin: 0 0 0 var(--m);
+    padding: 0;
+    border: 0;
+  }
+  .carru__h {
+    font-size: clamp(56px, 5.4vw, 96px);
+  }
+  .carru__pista {
+    text-align: left;
+  }
+  .carru__escena {
+    grid-column: 2;
+    grid-row: 1 / 3;
+    overflow: hidden; /* las vecinas no se meten en la columna del texto */
+    transform-style: flat;
+  }
+  .carru__pieza {
+    height: min(calc(100% - 16px), calc(48vw / var(--ar)));
+    max-height: none;
+    max-width: none;
+  }
+  .carru__pie {
+    grid-column: 1;
+    grid-row: 2;
+    align-self: end;
+    grid-template-columns: 1fr;
+    gap: 22px;
+    margin: 0 0 0 var(--m);
+    padding-top: 16px;
+  }
+  .carru__info {
+    min-height: 0;
+  }
+  .carru__texto {
+    max-width: 34ch;
+  }
+  .carru__controles {
+    flex-wrap: wrap;
+  }
+}
+@media (max-width: 760px) {
+  .carru {
+    grid-template-rows: auto minmax(0, 1fr) auto;
+    min-height: 640px;
+  }
+  .carru__h {
+    font-size: 15vw;
+  }
+  .carru__cabeza {
+    padding-bottom: 8px;
+  }
+  .carru__pieza {
+    height: min(calc(100% - 12px), calc(74vw / var(--ar)));
+    max-height: none;
+    max-width: none;
+  }
+}
+@media (min-width: 1024px) {
+  /* la que se va por la izquierda se funde en vez de cortarse en seco contra el texto */
+  .carru__escena {
+    -webkit-mask-image: linear-gradient(to right, transparent, #000 7%);
+    mask-image: linear-gradient(to right, transparent, #000 7%);
+  }
+}
+@media (max-width: 760px) {
+  .carru__pista {
+    display: none;
+  }
+}
+
+/* tablet: el armado apilado de celu, con la pieza tan alta como entre */
+@media (min-width: 761px) and (max-width: 1023px) {
+  .carru__pieza {
+    height: min(calc(100% - 16px), calc(60vw / var(--ar)));
+    max-height: none;
+    max-width: none;
+  }
+  .nav__centro {
+    display: none;
+  }
 }

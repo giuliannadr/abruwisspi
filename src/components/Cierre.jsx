@@ -13,22 +13,28 @@ export default function Cierre() {
   useEffect(() => {
     const el = fluo.current
     if (!el || reduce() || !matchMedia('(pointer: fine)').matches) return
-    let tx = 10, ty = -6, x = tx, y = ty, raf
-    const mover = (e) => {
-      const r = el.parentElement.getBoundingClientRect()
-      tx = ((e.clientX - r.left) / r.width - 0.5) * 18
-      ty = ((e.clientY - r.top) / r.height - 0.5) * 12
-    }
+    let tx = 10, ty = -6, x = tx, y = ty, raf = 0, visible = false
     const loop = () => {
       x += (tx - x) * 0.08
       y += (ty - y) * 0.08
       el.style.transform = `translate(${x}px, ${y}px)`
-      raf = requestAnimationFrame(loop)
+      // se duerme cuando llegó (o cuando no se ve) y despierta con el próximo movimiento
+      raf = visible && Math.abs(tx - x) + Math.abs(ty - y) > 0.05 ? requestAnimationFrame(loop) : 0
     }
+    const mover = (e) => {
+      if (!visible) return
+      const r = el.parentElement.getBoundingClientRect()
+      tx = ((e.clientX - r.left) / r.width - 0.5) * 18
+      ty = ((e.clientY - r.top) / r.height - 0.5) * 12
+      if (!raf) raf = requestAnimationFrame(loop)
+    }
+    const io = new IntersectionObserver(([e]) => { visible = e.isIntersecting })
+    io.observe(el.parentElement)
+    el.style.transform = `translate(${x}px, ${y}px)`
     addEventListener('pointermove', mover, { passive: true })
-    loop()
     return () => {
       cancelAnimationFrame(raf)
+      io.disconnect()
       removeEventListener('pointermove', mover)
     }
   }, [])
