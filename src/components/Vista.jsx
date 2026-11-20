@@ -42,13 +42,13 @@ export default function Vista({ p, cerrar, abrir }) {
           )}
         </div>
       </header>
-      <div className="vista__piezas">
+      <div className="vista__piezas" style={{ '--cols': Math.min(p.piezas.length, 3) }}>
         {p.piezas.map((f, k) => (
           <img
             key={f.src}
             src={img(f.src)}
             srcSet={`${img(f.src, 'sm')} 900w, ${img(f.src)} ${f.w}w`}
-            sizes="(max-width: 760px) 100vw, 90vw"
+            sizes="(max-width: 760px) 100vw, 45vw"
             width={f.w}
             height={f.h}
             alt={f.alt}

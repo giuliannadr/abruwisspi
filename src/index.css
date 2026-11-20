@@ -181,9 +181,8 @@ figure {
   grid-template-columns: 1fr auto 1fr;
   align-items: start;
   color: var(--bordo);
-  background: rgba(246, 211, 218, 0.55);
-  -webkit-backdrop-filter: blur(12px) saturate(1.2);
-  backdrop-filter: blur(12px) saturate(1.2);
+  /* sin backdrop-filter: el desenfoque sobre los reels se recalculaba en cada cuadro del video */
+  background: rgba(246, 211, 218, 0.94);
   transform: translateY(-105%);
   transition: transform 450ms var(--ease-out);
 }
@@ -343,9 +342,7 @@ figure {
   padding: 8px 10px;
   max-width: 24ch;
   color: var(--bordo);
-  background: rgba(246, 211, 218, 0.55);
-  -webkit-backdrop-filter: blur(12px);
-  backdrop-filter: blur(12px);
+  background: rgba(246, 211, 218, 0.9);
 }
 .portada__bajada b {
   color: var(--cherry);
@@ -1222,6 +1219,16 @@ figure {
   overscroll-behavior: contain;
   background: var(--fondo);
   color: var(--tinta);
+  scrollbar-width: none;
+}
+.vista::-webkit-scrollbar {
+  display: none;
+}
+/* Con la ficha abierta, la página de atrás no reserva lugar para su barra:
+   así la ficha ocupa todo el ancho de la pantalla. */
+html:has(.vista) {
+  scrollbar-gutter: auto;
+  overflow: hidden;
 }
 .vista__barra {
   position: sticky;
@@ -1655,7 +1662,7 @@ figure {
 /* ---------- Nav sobre secciones oscuras ---------- */
 .nav[data-oscuro='true'] {
   color: var(--claro);
-  background: rgba(43, 3, 12, 0.5);
+  background: rgba(43, 3, 12, 0.92);
 }
 
 .nav[data-oscuro='true']::after {
@@ -1936,5 +1943,19 @@ img.sobre__foto {
   }
   .nav__centro {
     display: none;
+  }
+}
+
+/* ---------- Ficha en compu: las piezas en grilla, enteras y sin recortar ---------- */
+@media (min-width: 761px) {
+  /* cada columna mide lo que su pieza: quedan juntas y centradas, sin aire entre medio */
+  .vista__piezas {
+    grid-template-columns: repeat(var(--cols, 1), auto);
+    justify-content: center;
+    align-items: center;
+  }
+  .vista__piezas img {
+    max-height: 86svh;
+    max-width: calc((100vw - (var(--cols, 1) + 1) * var(--m)) / var(--cols, 1));
   }
 }

@@ -2,6 +2,7 @@ import { useCallback, useEffect, useRef, useState } from 'react'
 import { series, reels } from '../data/fotos'
 import { img } from '../data/site'
 import { transicion, getLenis, reduce } from '../lib/motion'
+import { useArrastre } from '../lib/arrastre'
 
 // Fotografía separada en proyectos: cada serie con su título, su bajada y su tira.
 // Al tocar una foto, viaja al visor (elemento compartido).
@@ -17,7 +18,8 @@ function verEnPantalla(v) {
     v.src = v.dataset.src
     io.disconnect()
   }, { rootMargin: '900px' }).observe(v)
-  new IntersectionObserver(([e]) => (e.isIntersecting ? v.play().catch(() => {}) : v.pause()), { rootMargin: '100px' }).observe(v)
+  // arranca recién cuando se ve más de la mitad: menos videos decodificando a la vez mientras se scrollea
+  new IntersectionObserver(([e]) => (e.isIntersecting ? v.play().catch(() => {}) : v.pause()), { threshold: 0.5 }).observe(v)
 }
 
 function Tira({ s, abrir }) {
@@ -75,63 +77,7 @@ function Tira({ s, abrir }) {
     }
   }, [loop])
 
-  // Arrastrar la tira con el mouse (en táctil ya se desliza sola). Al soltar sigue con la inercia del gesto.
-  useEffect(() => {
-    const el = ref.current
-    if (!el || !matchMedia('(pointer: fine)').matches) return
-    let x0 = 0, s0 = 0, abajo = false, movido = false // s0 cambia al dar la vuelta
-    let vel = 0, ultX = 0, ultT = 0, raf = 0
-    // en loop, al pasar el borde salta a la otra vuelta (es la misma foto)
-    const ubicar = (x) => {
-      if (el.dataset.loop === 'true') {
-        const mitad = el.scrollWidth / 2
-        if (x >= mitad) { x -= mitad; s0 -= mitad }
-        else if (x < 0) { x += mitad; s0 += mitad }
-      }
-      el.scrollLeft = x
-    }
-    const inercia = () => {
-      vel *= 0.94
-      if (Math.abs(vel) < 0.02) return
-      ubicar(el.scrollLeft - vel * 16)
-      raf = requestAnimationFrame(inercia)
-    }
-    const down = (e) => {
-      if (e.button > 0) return
-      cancelAnimationFrame(raf)
-      abajo = true; movido = false; x0 = ultX = e.clientX; ultT = performance.now(); vel = 0; s0 = el.scrollLeft
-    }
-    const move = (e) => {
-      if (!abajo) return
-      const dx = e.clientX - x0
-      if (!movido && Math.abs(dx) > 4) { movido = true; el.dataset.arrastrando = '' }
-      const t = performance.now()
-      vel = (e.clientX - ultX) / Math.max(1, t - ultT); ultX = e.clientX; ultT = t
-      ubicar(s0 - dx)
-    }
-    const up = () => {
-      if (!abajo) return
-      abajo = false
-      delete el.dataset.arrastrando
-      if (!movido) return
-      if (performance.now() - ultT > 80) vel = 0 // la soltó quieta
-      if (!reduce()) raf = requestAnimationFrame(inercia)
-    }
-    const click = (e) => { if (movido) { e.stopPropagation(); e.preventDefault() } }
-    el.addEventListener('pointerdown', down)
-    addEventListener('pointermove', move)
-    addEventListener('pointerup', up)
-    addEventListener('pointercancel', up)
-    el.addEventListener('click', click, true)
-    return () => {
-      cancelAnimationFrame(raf)
-      el.removeEventListener('pointerdown', down)
-      removeEventListener('pointermove', move)
-      removeEventListener('pointerup', up)
-      removeEventListener('pointercancel', up)
-      el.removeEventListener('click', click, true)
-    }
-  }, [])
+  useArrastre(ref)
 
   // dos vueltas de la misma serie: la segunda es copia (oculta para lectores de pantalla)
   const vuelta = loop ? [...s.fotos, ...s.fotos] : s.fotos
