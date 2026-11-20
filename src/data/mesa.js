@@ -1,5 +1,6 @@
 // Piezas que flotan detrás del nombre en la portada: [imagen, título, ancho, x, y, giro].
 // La mesa mide 2400 × 1500 y se mueve siguiendo al mouse.
+// Usan la versión -xs.webp, que ya está en blanco y negro (grayscale + contraste 1.06).
 export const MESA = { w: 2400, h: 1500 }
 
 export const piezasMesa = [

@@ -17,7 +17,7 @@ function verEnPantalla(v) {
     v.poster = v.dataset.poster
     v.src = v.dataset.src
     io.disconnect()
-  }, { rootMargin: '900px' }).observe(v)
+  }, { rootMargin: '400px' }).observe(v)
   // arranca recién cuando se ve más de la mitad: menos videos decodificando a la vez mientras se scrollea
   new IntersectionObserver(([e]) => (e.isIntersecting ? v.play().catch(() => {}) : v.pause()), { threshold: 0.5 }).observe(v)
 }

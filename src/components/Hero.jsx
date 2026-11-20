@@ -19,17 +19,23 @@ export default function Hero() {
     const figs = [...el.children].map((f, i) => ({ f, d: 0.75 + ((i * 37) % 10) / 20 }))
     const fino = matchMedia('(pointer: fine)').matches
     const quieto = reduce()
-    let mx = 0.5, my = 0.5, x = 0.5, y = 0.5, t = 0, raf, visible = true
-    const mover = (e) => { mx = e.clientX / innerWidth; my = e.clientY / innerHeight }
-    const io = new IntersectionObserver(([e]) => { visible = e.isIntersecting })
+    let mx = 0.5, my = 0.5, x = 0.5, y = 0.5, t = 0, raf = 0, visible = true
+    // El bucle duerme cuando la portada no se ve o cuando las piezas ya llegaron (mouse quieto):
+    // así no se reescriben 15 estilos por cuadro sin que nada cambie.
+    const despertar = () => { if (!raf && visible) raf = requestAnimationFrame(loop) }
+    const mover = (e) => { mx = e.clientX / innerWidth; my = e.clientY / innerHeight; despertar() }
+    const io = new IntersectionObserver(([e]) => { visible = e.isIntersecting; despertar() })
     io.observe(hero)
     addEventListener('pointermove', mover, { passive: true })
+    addEventListener('resize', despertar)
     const loop = () => {
-      raf = requestAnimationFrame(loop)
+      raf = 0
       if (!visible) return
       if (!fino && !quieto) { t += 0.0022; mx = 0.5 + Math.sin(t) * 0.38; my = 0.5 + Math.cos(t * 0.8) * 0.32 }
       const k = quieto ? 1 : 0.06
       x += (mx - x) * k; y += (my - y) * k
+      // en táctil se mueve siempre; con mouse, sigue solo mientras falte camino
+      if ((!fino && !quieto) || Math.abs(mx - x) + Math.abs(my - y) > 0.0004) raf = requestAnimationFrame(loop)
       const esc = innerWidth < 760 ? 0.48 : 1
       const bx = -(MESA.w * esc - innerWidth) * x, by = -(MESA.h * esc - hero.clientHeight) * y
       el.style.transform = `translate3d(${bx}px, ${by}px, 0) scale(${esc})`
@@ -37,7 +43,7 @@ export default function Hero() {
       for (const { f, d } of figs) f.style.translate = `${-ox * (d - 1) * 2}px ${-oy * (d - 1) * 2}px`
     }
     loop()
-    return () => { cancelAnimationFrame(raf); removeEventListener('pointermove', mover); io.disconnect() }
+    return () => { cancelAnimationFrame(raf); removeEventListener('pointermove', mover); removeEventListener('resize', despertar); io.disconnect() }
   }, [])
 
   // Entrada: el nombre sube desde su línea, ella aparece y las piezas caen sobre la mesa.

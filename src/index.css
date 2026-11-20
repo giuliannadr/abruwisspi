@@ -916,6 +916,10 @@ figure {
   height: auto;
   aspect-ratio: 9 / 16;
   object-fit: cover;
+  /* Chrome en Windows pasa los videos opacos a un "overlay" de hardware; con tres a la vez sobre
+     esta página la GPU se colgaba de 3 a 7 s la primera vez. Con opacidad apenas menor a 1 no los
+     promueve y se componen como cualquier capa (medido: primer recorrido de 12,6 s a 6,9 s). */
+  opacity: 0.999;
 }
 .reel figcaption {
   margin-top: 10px;
@@ -1803,10 +1807,8 @@ img.sobre__foto {
 }
 
 /* ---------- Correcciones 15/11 ---------- */
-/* portada: las piezas de fondo en blanco y negro, para que ella sea lo único con color */
-.portada__pieza img {
-  filter: grayscale(1) contrast(1.06);
-}
+/* portada: las piezas de fondo van en blanco y negro (ya vienen grises en las -xs.webp,
+   así la GPU no aplica un filtro a 14 capas que se mueven en cada cuadro) */
 .tira[data-arrastrando] {
   cursor: grabbing;
 }
