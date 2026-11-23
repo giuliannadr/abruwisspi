@@ -18,8 +18,9 @@ export function startLenis() {
 }
 export const getLenis = () => lenis
 
-export function scrollTo(target) {
-  if (lenis) lenis.scrollTo(target, { offset: 0, duration: 1.1 })
+// offset: para dejar lugar al menú fijo (negativo = queda más abajo del borde de arriba)
+export function scrollTo(target, offset = 0) {
+  if (lenis) lenis.scrollTo(target, { offset, duration: 1.1 })
   else document.querySelector(target)?.scrollIntoView({ behavior: reduce() ? 'auto' : 'smooth' })
 }
 

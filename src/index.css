@@ -3131,3 +3131,134 @@ img {
   top: auto;
   bottom: 40px;
 }
+
+/* ---------- Fotografía (2026-11-23): limpia, todo sobre el papel claro ----------
+   Pisa el armado viejo de franjas de colores: mismo fondo, línea fina entre series, títulos quietos. */
+.fotos {
+  background: var(--claro) url(/tex/grano.webp);
+  color: var(--bordo);
+  padding-bottom: 40px;
+}
+.fotos__indice {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px 28px;
+  padding: 28px var(--m) 36px;
+  font-weight: 800;
+  font-size: 13px;
+  text-transform: uppercase;
+}
+.fotos__indice a {
+  color: inherit;
+  text-decoration: underline;
+  text-decoration-thickness: 2px;
+  text-underline-offset: 4px;
+  text-decoration-color: rgba(43, 3, 12, 0.25);
+  transition: text-decoration-color 160ms ease-out;
+}
+@media (hover: hover) {
+  .fotos__indice a:hover {
+    text-decoration-color: currentColor;
+  }
+}
+.fotos .serie,
+.fotos .serie[data-fondo],
+.fotos .serie--reels {
+  background: none;
+  color: var(--bordo);
+  padding: 0 0 88px;
+  min-height: 0;
+}
+.fotos .serie__cabeza,
+.fotos .serie[data-lado] .serie__cabeza {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 54ch);
+  align-items: start;
+  gap: 24px 48px;
+  margin: 0 var(--m) 28px;
+  padding: 16px 0 0;
+  border-top: 2px solid currentColor;
+  border-bottom: 0;
+}
+.fotos .serie__titulo {
+  order: 0;
+  margin: 0;
+  text-align: left;
+  font-size: clamp(44px, 5.4vw, 96px);
+  color: var(--cherry);
+  transform: none !important;
+}
+.fotos .serie__bajada {
+  max-width: none;
+  margin: 0;
+  font-size: 15px;
+  line-height: 1.55;
+  text-align: left;
+}
+.fotos .serie__bajada b {
+  color: var(--cherry);
+}
+.fotos .serie__bajada mark {
+  --fibra: rgba(255, 79, 163, 0.38);
+}
+/* la tira: arranca en el margen y se sale por la derecha */
+.fotos .tira {
+  padding: 0 var(--m);
+  gap: 12px;
+}
+.fotos .tira__cuadro {
+  height: clamp(280px, 58svh, 560px);
+  background: none;
+}
+.fotos .reels {
+  display: flex;
+  gap: 12px;
+  padding: 0 var(--m);
+  justify-content: start;
+}
+.fotos .reel {
+  width: clamp(200px, 22vw, 300px);
+  margin: 0;
+}
+.fotos .reel figcaption {
+  color: var(--bordo);
+}
+@media (max-width: 860px) {
+  .fotos .serie__cabeza,
+  .fotos .serie[data-lado] .serie__cabeza {
+    grid-template-columns: 1fr;
+    gap: 12px;
+  }
+  .fotos .serie__titulo {
+    font-size: 13vw;
+  }
+  .fotos .serie__bajada {
+    font-size: 14px;
+  }
+  .fotos .tira__cuadro {
+    height: 62vw;
+  }
+  .fotos .reels {
+    overflow-x: auto;
+    scrollbar-width: none;
+  }
+  .fotos .reel {
+    flex: none;
+    width: 46vw;
+  }
+}
+
+/* títulos de categoría siempre en una línea (Giuli, 2026-11-23): un poco más chicos, sin cortar */
+.catc__h {
+  white-space: nowrap;
+  font-size: clamp(52px, 7.4vw, 150px);
+}
+@media (max-width: 860px) {
+  .catc__h {
+    font-size: 10.5vw;
+  }
+  .cat2__nombre {
+    white-space: nowrap;
+    font-size: 5.6vw;
+  }
+}

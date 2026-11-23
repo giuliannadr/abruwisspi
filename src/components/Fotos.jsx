@@ -4,10 +4,12 @@ import { series, reels, reelsBajada } from '../data/fotos'
 // Las palabras clave van entre **asteriscos** en los datos y se resaltan como con fibra.
 const conClaves = (t) => t.split(/\*\*(.+?)\*\*/g).map((x, i) => (i % 2 ? <mark key={i}>{x}</mark> : x))
 import { img } from '../data/site'
-import { transicion, getLenis, reduce } from '../lib/motion'
+import { transicion, getLenis, reduce, scrollTo as irA } from '../lib/motion'
 import { useArrastre } from '../lib/arrastre'
 
-// Fotografía separada en proyectos: cada serie con su título, su bajada y su tira.
+// Fotografía (2026-11-23): todo sobre el mismo papel claro, sin franjas de color ni costuras.
+// Un índice arriba; cada serie separada por una línea fina: título a la izquierda, texto chico al lado
+// y su tira de fotos alineada al margen, que se sale por la derecha (se arrastra).
 // Al tocar una foto, viaja al visor (elemento compartido).
 
 // Los reels no bajan nada hasta que están cerca (ni la imagen de portada) y solo se reproducen mientras se ven.
@@ -142,37 +144,33 @@ export default function Fotos({ sinCabeza = false }) {
         <header className="fotos__portada">
           <h2 className="fotos__h" id="fotos-h" data-titulo><span>Fotografía</span></h2>
           <p className="fotos__cuenta" data-reveal style={{ '--i': 1 }}>
-            ({series.length + 1}) series: books, estudio, producto, repostería y reels
+            ({series.length + 1}) series: books, polas, producto, repostería y reels
           </p>
         </header>
       )}
 
-      {series.map((s, k) => {
-        const arriba = k === 0 ? 'claro' : series[k - 1].fondo
-        return (
-        <article
-          className="serie"
-          key={s.id}
-          data-fondo={s.fondo}
-          data-lado={k % 2 ? 'der' : 'izq'}
-          data-costura={arriba !== s.fondo ? '' : undefined}
-          style={{ '--arriba': `var(--${arriba})` }}
-          aria-labelledby={`serie-${s.id}`}
-        >
+      {/* índice: saltar a cada serie */}
+      <nav className="fotos__indice" aria-label="Series de fotos">
+        {[...series.map((s) => [s.id, s.nombre]), ['reels', 'Reels']].map(([id, nombre]) => (
+          <a key={id} href={`#serie-${id}`} onClick={(e) => { e.preventDefault(); irA(`#bloque-${id}`, -64) }}>{nombre}</a>
+        ))}
+      </nav>
+
+      {series.map((s) => (
+        <article className="serie" id={`bloque-${s.id}`} key={s.id} aria-labelledby={`serie-${s.id}`}>
           <header className="serie__cabeza">
-            <h3 className="serie__titulo" id={`serie-${s.id}`} data-titulo data-deriva={k % 2 ? 1 : -1}><span>{s.nombre}</span></h3>
+            <h3 className="serie__titulo" id={`serie-${s.id}`} data-reveal>{s.nombre}</h3>
             <p className="serie__bajada" data-reveal style={{ '--i': 1 }}>
               <b>({s.fotos.length})</b> {conClaves(s.bajada)}
             </p>
           </header>
           <Tira s={s} abrir={abrir} />
         </article>
-        )
-      })}
+      ))}
 
-      <article className="serie serie--reels" data-fondo="bordo" data-costura="" style={{ '--arriba': `var(--${series.at(-1).fondo})` }} aria-labelledby="serie-reels">
+      <article className="serie serie--reels" id="bloque-reels" aria-labelledby="serie-reels">
         <header className="serie__cabeza">
-          <h3 className="serie__titulo" id="serie-reels" data-titulo data-deriva="-1"><span>Reels</span></h3>
+          <h3 className="serie__titulo" id="serie-reels" data-reveal>Reels</h3>
           <p className="serie__bajada" data-reveal style={{ '--i': 1 }}>
             <b>({reels.length})</b> {conClaves(reelsBajada)}
           </p>

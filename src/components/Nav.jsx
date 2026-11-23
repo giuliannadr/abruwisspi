@@ -26,7 +26,7 @@ export default function Nav({ pagina, inicio }) {
       for (const e of entries) e.isIntersecting ? debajo.add(e.target) : debajo.delete(e.target)
       evaluar()
     }, { rootMargin: `-70px 0px -${Math.max(0, innerHeight - 71)}px 0px` })
-    document.querySelectorAll('.carru, .catc, .tarot, .pliego2[data-oscuro], .cierre, .serie[data-fondo="cherry"], .serie[data-fondo="bordo"]').forEach((el) => io.observe(el))
+    document.querySelectorAll('.carru, .catc, .tarot, .pliego2[data-oscuro], .cierre').forEach((el) => io.observe(el))
     // en El Principito el menú se esconde: las cartas salen de la caja hasta arriba y no tiene que taparlas
     const sobre = new Set()
     const ioP = new IntersectionObserver((es) => { for (const e of es) e.isIntersecting ? sobre.add(e.target) : sobre.delete(e.target); setEscondido(sobre.size > 0) }, { rootMargin: `0px 0px -${Math.max(0, innerHeight - 71)}px 0px` })
