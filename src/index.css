@@ -3214,3 +3214,42 @@ html::-webkit-scrollbar {
     height: 96px;
   }
 }
+
+/* Patagonia: el isotipo y el logotipo uno al lado del otro, no apilados */
+.estudio__marca {
+  grid-template-columns: auto auto;
+  justify-content: center;
+  align-items: center;
+  column-gap: clamp(48px, 8vw, 140px);
+}
+.estudio__marca .estudio__rotulo {
+  grid-column: 1 / -1;
+}
+.estudio__logotipo {
+  margin-top: 0;
+  width: min(420px, 34vw);
+}
+.estudio__isotipo {
+  height: min(44svh, 400px);
+}
+@media (max-width: 860px) {
+  .estudio__marca {
+    column-gap: 20px;
+  }
+  .estudio__isotipo {
+    height: 34vw;
+  }
+  .estudio__logotipo {
+    width: 48vw;
+  }
+}
+
+/* Chrome pone un botón (Gemini / Lens) encima de cada imagen al pasar el mouse. Las imágenes no reciben
+   el mouse (los clics y arrastres están en sus contenedores), así el botón no aparece.
+   Excepción: en el visor de fotos, tocar la foto no tiene que contar como tocar el fondo (que cierra). */
+img {
+  pointer-events: none;
+}
+.visor img {
+  pointer-events: auto;
+}
