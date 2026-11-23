@@ -1,80 +1,189 @@
-import { useState } from 'react'
+import { useEffect, useLayoutEffect, useRef, useState } from 'react'
 import { motion, useReducedMotion } from 'motion/react'
+import { gsap } from 'gsap'
+import { ScrollTrigger } from 'gsap/ScrollTrigger'
 import { cartas } from '../data/fotos'
+import { porId } from '../data/proyectos'
 import { img } from '../data/site'
+import { reduce } from '../lib/motion'
+import Caja from './Caja'
 
-// El mazo de El Principito que diseñó Abril, para jugar:
-// arrastrá la carta de arriba para mandarla al fondo, tocala para darla vuelta.
-const pila = [
-  { rotate: -9, x: -26, y: 14 },
-  { rotate: 6, x: 22, y: 6 },
-  { rotate: -1.5, x: 0, y: 0 },
-]
+gsap.registerPlugin(ScrollTrigger)
+
+// El Principito: la caja y las cartas en el centro, a todo el ancho; alrededor, en las esquinas,
+// el título (arriba a la izquierda), los botones chicos (arriba a la derecha) y el texto abajo, a lo ancho,
+// todos alineados con los bordes de la composición (--borde, lo calcula el scroll).
+// El objeto es UNA sola pieza: la caja arranca grande en el centro, al bajar se corre a su lugar,
+// la tapa se abre y las cartas salen por la boca
+// (lo que sigue adentro queda recortado en el borde del frente) y se sirven en fila: en compu a la izquierda
+// de la caja, en celu arriba. Grandes, sin tocarse entre ellas ni tocar la caja, sin salir de su columna. Al final: tocar una carta la da vuelta, arrastrarla y soltarla la devuelve
+// a su lugar, y la caja se gira arrastrando.
+// En compu la sección queda fija mientras pasa; en celu se anima sola al pasar, sin fijarse.
+const p = porId.principito
+
+const lerp = (a, b, t) => a + (b - a) * t
+const tramo = (v, a, b) => Math.min(1, Math.max(0, (v - a) / (b - a)))
+const salir = (t) => 1 - Math.pow(1 - t, 3)
+const ida = (t) => (t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2)
 
 export default function Mazo({ abrir }) {
-  const [orden, setOrden] = useState(cartas.map((c) => c.id)) // el último es el de arriba
+  const sec = useRef(null), escena = useRef(null), caja = useRef(null)
+  const salidas = useRef([])
+  const repintar = useRef(() => {})
   const [vueltas, setVueltas] = useState({})
+  const [fase, setFase] = useState('cerrada') // cerrada → saliendo → lista
   const quieto = useReducedMotion()
-  const arriba = orden[orden.length - 1]
 
-  const alFondo = () => setOrden((o) => [o[o.length - 1], ...o.slice(0, -1)])
-  const darVuelta = (id = arriba) => setVueltas((v) => ({ ...v, [id]: !v[id] }))
+  const darVuelta = (id) => setVueltas((v) => ({ ...v, [id]: !v[id] }))
+  const todas = () => setVueltas((v) => {
+    const alguna = cartas.some((c) => !v[c.id])
+    return Object.fromEntries(cartas.map((c) => [c.id, alguna]))
+  })
+
+  useLayoutEffect(() => {
+    const esc = escena.current
+    const frente = caja.current.querySelector('.caja__cara--frente')
+    const wrap = esc.querySelector('.principito__caja')
+    const pintar = (prog) => {
+      const e = esc.getBoundingClientRect()
+      const celu = e.width < 600
+      // medidas en reposo (sin la transformación del scroll)
+      const cw = salidas.current[0].offsetWidth, ch = salidas.current[0].offsetHeight
+      const bw = caja.current.querySelector('.caja__escena').offsetWidth
+      const bh = caja.current.querySelector('.caja__escena').offsetHeight
+      // dónde termina la caja: compu, a la derecha de la fila (todo el grupo centrado); celu, abajo
+      const gap = celu ? 0 : Math.min(40, e.width * 0.025)
+      const total = 3 * cw + 2 * gap + gap * 1.6 + bw
+      const izq = (e.width - total) / 2
+      const finX = celu ? 0 : izq + 3 * cw + 2 * gap + gap * 1.6 + bw / 2 - e.width / 2
+      const finY = celu ? e.height - 96 - bh / 2 - e.height / 2 : 0
+      // los textos de las esquinas se alinean con los bordes de la composición (cartas + caja)
+      if (!celu) sec.current.style.setProperty('--borde', `${Math.max(0, izq)}px`)
+      // 1) la caja arranca grande en el centro y se desliza a su lugar
+      const m = ida(tramo(prog, 0.08, 0.3))
+      wrap.style.transform = `translate3d(${finX * m}px, ${finY * m}px, 0) scale(${lerp(1.3, 1, m)})`
+      // 2) se abre la tapa
+      esc.style.setProperty('--tapa', salir(tramo(prog, 0.28, 0.38)).toFixed(3))
+      // 3) las cartas salen por la boca y van a su lugar
+      const f = frente.getBoundingClientRect() // el frente ya girado: su borde de arriba es la boca
+      const boca = { x: f.left + f.width / 2 - e.left, y: f.top - e.top + 2 }
+      const s0 = Math.min(1, (f.width * 0.84) / cw)
+      let filas, giros
+      if (celu) {
+        // celu: la caja abajo al centro; las cartas en fila arriba de la tapa, un poco montadas como una mano
+        const y = boca.y - 56 - ch / 2
+        filas = [-1, 0, 1].map((k) => ({ x: e.width / 2 + k * cw * 0.78, y: y + Math.abs(k) * 10 }))
+        giros = [-6, 0, 6]
+      } else {
+        // compu: la fila a la izquierda de la caja, apoyadas en la misma línea que ella
+        const base = e.height / 2 + bh / 2
+        filas = [0, 1, 2].map((i) => ({ x: izq + cw / 2 + i * (cw + gap), y: base - ch / 2 }))
+        giros = [-3, 2, -1.5]
+      }
+      salidas.current.forEach((el, i) => {
+        const a = 0.36 + i * 0.17
+        const sube = salir(tramo(prog, a, a + 0.1)) // sale derecha por la boca
+        const va = ida(tramo(prog, a + 0.1, a + 0.24)) // va a su lugar
+        const yAdentro = boca.y + (ch * s0) / 2
+        const yAfuera = boca.y - ch * s0 * 0.08 // sale un poco más de la mitad: no sube tanto (en pantallas bajas se cortaba)
+        const fin = filas[i]
+        const x = lerp(boca.x, fin.x, va)
+        const y = lerp(lerp(yAdentro, yAfuera, sube), fin.y, va)
+        const s = lerp(s0, 1, va)
+        const r = lerp(0, giros[i], va)
+        // mientras la carta siga delante de la caja, lo que está por debajo de la boca no se ve:
+        // así parece que la sacan de adentro y la deslizan de costado
+        const encima = x + (cw * s) / 2 > f.left - e.left
+        const abajo = encima ? Math.max(0, (y + (ch * s) / 2 - boca.y) / s) : 0
+        el.style.transform = `translate3d(${x - cw / 2}px, ${y - ch / 2}px, 0) rotate(${r}deg) scale(${s})`
+        el.style.clipPath = abajo > 0 ? `inset(-40px -40px ${abajo}px -40px)` : "none"
+        el.style.visibility = sube > 0 ? 'visible' : 'hidden'
+      })
+      setFase(prog < 0.26 ? 'cerrada' : prog < 0.95 ? 'saliendo' : 'lista')
+    }
+
+    if (reduce()) {
+      const r = () => pintar(1)
+      repintar.current = r
+      r()
+      addEventListener('resize', r)
+      return () => removeEventListener('resize', r)
+    }
+    const mm = gsap.matchMedia()
+    let st
+    mm.add('(min-width: 861px)', () => {
+      st = ScrollTrigger.create({ trigger: sec.current, start: 'top top', end: '+=150%', pin: true, onUpdate: (s) => pintar(s.progress), onRefresh: (s) => pintar(s.progress) })
+      return () => st.kill()
+    })
+    mm.add('(max-width: 860px)', () => {
+      st = ScrollTrigger.create({ trigger: esc, start: 'top 70%', end: 'bottom 95%', scrub: 0.4, onUpdate: (s) => pintar(s.progress), onRefresh: (s) => pintar(s.progress) })
+      return () => st.kill()
+    })
+    repintar.current = () => st && pintar(st.progress)
+    return () => mm.revert()
+  }, [])
+
+  // la caja tarda un poco en ponerse de frente (o en soltarse): se repinta unos cuadros para seguir la boca
+  useEffect(() => {
+    let raf = 0, n = 0
+    const seguir = () => { repintar.current(); if (++n < 45) raf = requestAnimationFrame(seguir) }
+    raf = requestAnimationFrame(seguir)
+    return () => cancelAnimationFrame(raf)
+  }, [fase])
 
   return (
-    <section className="mazo" id="cartas" aria-labelledby="mazo-h">
-      <div className="mazo__texto">
-        <h2 className="mazo__h" id="mazo-h" data-titulo><span>El Principito</span></h2>
-        <p data-reveal style={{ '--i': 1 }}>
-          Cartas y caja. Un mazo coleccionable con los personajes de los planetas. Cada carta trae su frase y tres palabras que lo describen, y el dorso es su objeto: el farol, la galera, el mundo.
-        </p>
-        <p className="mazo__nombre" aria-live="polite" data-reveal style={{ '--i': 2 }}>
-          Arriba: {cartas.find((c) => c.id === arriba).nombre}
-          {vueltas[arriba] ? ', de dorso' : ''}
-        </p>
-        <div className="mazo__acciones" data-reveal style={{ '--i': 3 }}>
-          <button className="btn btn--cherry" onClick={() => darVuelta()}>Dar vuelta</button>
-          <button className="btn" onClick={alFondo}>Pasar carta</button>
-          <button className="btn btn--claro" onClick={(e) => abrir('principito', e.currentTarget)}>Ver la caja</button>
+    <section className="principito" id="cartas" aria-labelledby="mazo-h" ref={sec} data-fase={fase}>
+      <div className="principito__objeto" ref={escena}>
+        <div className="principito__caja">
+          <Caja frente={fase === 'saliendo'} sinGiroSolo={fase === 'lista'} cajaRef={caja} />
         </div>
-      </div>
 
-      <div className="mazo__mesa" data-entra="reparte">
-        {orden.map((id, i) => {
-          const c = cartas.find((x) => x.id === id)
-          const top = id === arriba
-          const pos = pila[i]
-          return (
+        {cartas.map((c, i) => (
+          <div key={c.id} className="principito__salida" ref={(el) => (salidas.current[i] = el)} style={{ zIndex: 10 + i }}>
             <motion.div
-              key={id}
               className="carta"
-              data-top={top}
-              data-flip={!!vueltas[id]}
-              style={{ zIndex: i }}
-              initial={false}
-              animate={{ rotate: pos.rotate, x: pos.x, y: pos.y, scale: top ? 1 : 0.96 }}
-              transition={quieto ? { duration: 0 } : { type: 'spring', duration: 0.55, bounce: 0.22 }}
-              drag={top ? 'x' : false}
+              data-flip={!!vueltas[c.id]}
+              drag={fase === 'lista'}
               dragSnapToOrigin
-              dragElastic={0.6}
-              whileDrag={{ scale: 1.04, rotate: 0, filter: 'drop-shadow(0 22px 30px rgba(43, 3, 12, 0.35))' /* taste-skill-ignore: la carta flota mientras se arrastra */ }}
-              onDragEnd={(_, info) => {
-                if (Math.abs(info.offset.x) > 110 || Math.abs(info.velocity.x) > 500) alFondo()
-              }}
-              onTap={() => top && darVuelta(id)}
-              aria-hidden={!top}
+              dragElastic={0.5}
+              dragTransition={{ bounceStiffness: 420, bounceDamping: 26 }}
+              whileDrag={{ scale: 1.06, zIndex: 30 }}
+              transition={quieto ? { duration: 0 } : undefined}
+              onTap={() => fase === 'lista' && darVuelta(c.id)}
+              role="button"
+              tabIndex={fase === 'lista' ? 0 : -1}
+              aria-label={`${c.nombre}${vueltas[c.id] ? ', de dorso' : ''}. Tocá para darla vuelta.`}
+              onKeyDown={(e) => (e.key === 'Enter' || e.key === ' ') && (e.preventDefault(), darVuelta(c.id))}
             >
               <div className="carta__cuerpo">
                 <div className="carta__cara">
-                  <img src={img(`carta-${id}`, 'sm')} srcSet={`${img(`carta-${id}`, 'sm')} 600w, ${img(`carta-${id}`)} 1200w`} sizes="340px" width={c.w} height={c.h} alt={`Carta de ${c.nombre}`} draggable="false" loading="lazy" />
+                  <img src={img(`carta-${c.id}`, 'sm')} srcSet={`${img(`carta-${c.id}`, 'sm')} 600w, ${img(`carta-${c.id}`)} 1200w`} sizes="220px" width={c.w} height={c.h} alt="" draggable="false" loading="lazy" />
                 </div>
                 <div className="carta__cara carta__cara--dorso">
-                  <img src={img(`dorso-${id}`, 'sm')} width={c.w} height={c.h} alt={`Dorso de la carta de ${c.nombre}`} draggable="false" loading="lazy" />
+                  <img src={img(`dorso-${c.id}`, 'sm')} width={c.w} height={c.h} alt="" draggable="false" loading="lazy" />
                 </div>
               </div>
             </motion.div>
-          )
-        })}
+          </div>
+        ))}
+
       </div>
+
+      {/* alrededor, en las esquinas: título arriba a la izquierda, texto abajo a la izquierda, botones abajo a la derecha */}
+      <header className="principito__esquina principito__esquina--titulo">
+        <p className="principito__disc">{p.disciplina}</p>
+        <h2 className="principito__titulo" id="mazo-h">{p.titulo}</h2>
+      </header>
+      <div className="principito__esquina principito__esquina--botones">
+        <div className="disco__celdas">
+          <button onClick={(e) => abrir('principito', e.currentTarget)}>Ver el proyecto</button>
+          <button onClick={todas} disabled={fase !== 'lista'}>Dar vuelta las cartas</button>
+        </div>
+      </div>
+      <p className="principito__esquina principito__esquina--texto principito__desc">{p.texto}</p>
+      <p className="principito__esquina principito__esquina--pista principito__pista" aria-live="polite">
+        {fase === 'lista' ? 'Tocá una carta para darla vuelta' : 'Bajá para abrir la caja'}
+      </p>
     </section>
   )
 }

@@ -96,8 +96,6 @@ figure {
 .caps,
 .nav,
 .portada__bajada,
-.portada__pista,
-.portada__pieza figcaption,
 .indice__cabeza p,
 .indice__disc,
 .pliego__disc,
@@ -237,8 +235,7 @@ figure {
   .nav__links {
     gap: 14px;
   }
-  .nav__links a:nth-child(1),
-  .nav__links a:nth-child(3) {
+  .nav__links a:nth-child(2) {
     display: none;
   }
 }
@@ -250,39 +247,6 @@ figure {
   min-height: 620px;
   overflow: hidden;
   background: var(--rosa);
-}
-/* contenedor quieto de la mesa: se desvanece abajo para fundirse con la sección siguiente */
-.portada__fondo {
-  position: absolute;
-  inset: 0;
-  overflow: hidden;
-  -webkit-mask-image: linear-gradient(to bottom, #000 78%, transparent 100%);
-  mask-image: linear-gradient(to bottom, #000 78%, transparent 100%);
-}
-.portada__mesa {
-  position: absolute;
-  left: 0;
-  top: 0;
-  width: 2400px;
-  height: 1500px;
-  transform-origin: 0 0;
-  will-change: transform;
-}
-.portada__pieza {
-  position: absolute;
-  will-change: translate;
-}
-.portada__pieza img {
-  width: 100%;
-  height: auto;
-  pointer-events: none;
-  user-select: none;
-}
-.portada__pieza figcaption {
-  font-size: 12px;
-  color: var(--bordo);
-  margin-top: 7px;
-  opacity: 0.75;
 }
 /* sin z-index ni transform propio: cada línea se ordena sola contra la foto */
 .portada__nombre {
@@ -317,7 +281,7 @@ figure {
   color: var(--bordo);
   text-align: right;
 }
-.portada__abril {
+.portada__foto {
   position: absolute;
   z-index: 3;
   /* los pies se disuelven en el semitono (está en la imagen), sin corte al pasar a la sección siguiente */
@@ -327,6 +291,12 @@ figure {
   height: 94svh;
   aspect-ratio: 691 / 1088;
   pointer-events: none;
+}
+.portada__abril {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
 }
 .cierre__abril > .cierre__abril-fluo {
   position: absolute;
@@ -361,42 +331,10 @@ figure {
   right: calc(var(--m) - 10px);
   text-align: right;
 }
-.portada__pista {
-  position: absolute;
-  z-index: 6;
-  right: var(--m);
-  top: 50%;
-  transform: translateY(-50%) rotate(90deg);
-  transform-origin: right center;
-  font-size: 13px;
-}
-@media (pointer: coarse) {
-  .portada__pista {
-    display: none;
-  }
-}
-/* celu: una tapa propia. Arriba la línea de rol, ABRIL entero, ella grande desde abajo y WISSPI adelante */
-.portada__rol {
-  display: none;
-}
+/* celu: ABRIL arriba, ella grande desde abajo y WISSPI adelante */
 @media (max-width: 760px) {
   .portada {
     min-height: 600px;
-  }
-  .portada__rol {
-    display: block;
-    position: absolute;
-    z-index: 6;
-    top: 18px;
-    left: var(--m);
-    right: var(--m);
-    margin: 0;
-    padding-bottom: 10px;
-    border-bottom: 2px solid var(--bordo);
-    font-weight: 800;
-    font-size: 12px;
-    text-transform: uppercase;
-    color: var(--bordo);
   }
   .portada__nombre {
     display: block;
@@ -413,24 +351,15 @@ figure {
     top: 50svh;
     right: 0;
   }
-  .portada__abril {
+  .portada__foto {
     left: 50%;
     height: 80svh;
     margin-left: calc(80svh * 691 / 1088 * -0.5);
   }
-  .portada__mesa {
-    opacity: 0.85;
-  }
-  .portada__bajada--der {
-    display: none;
-  }
-  .portada__bajada--izq {
-    max-width: none;
+  .portada__bajada {
     bottom: 14px;
+    max-width: 15ch;
     font-size: 12px;
-  }
-  .portada__bajada--izq .portada__resto {
-    display: none;
   }
 }
 
@@ -565,12 +494,153 @@ figure {
 .mazo__mesa {
   position: relative;
   height: min(74svh, 660px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: clamp(28px, 4vw, 64px);
+}
+/* las cartas se apilan en su propio lugar, al lado de la caja */
+.mazo__pila {
+  position: relative;
+  width: min(22vw, 300px);
+  aspect-ratio: 760 / 1200;
   display: grid;
   place-items: center;
 }
+
+/* ---------- Caja 3D ---------- */
+.caja {
+  --w: min(17vw, 240px);
+  --h: calc(var(--w) * 1020 / 720);
+  --d: calc(var(--w) * 190 / 720);
+  position: relative;
+  margin: 0;
+  padding: var(--d) calc(var(--d) * 0.6) calc(var(--d) * 0.6);
+  cursor: grab;
+  user-select: none;
+  -webkit-user-select: none;
+  touch-action: pan-y; /* en celu se gira de costado y se sigue scrolleando para abajo */
+  outline: none;
+}
+.caja[data-arrastrando] {
+  cursor: grabbing;
+}
+.caja:focus-visible .caja__escena {
+  outline: 2px solid var(--cherry);
+  outline-offset: 14px;
+  border-radius: 4px;
+}
+.caja__escena {
+  width: var(--w);
+  height: var(--h);
+  perspective: 1100px;
+}
+.caja__cuerpo {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  transform-style: preserve-3d;
+  will-change: transform;
+}
+.caja__cara {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: var(--w);
+  height: var(--h);
+  backface-visibility: hidden;
+  pointer-events: none;
+}
+.caja__cara--frente {
+  transform: translateZ(calc(var(--d) / 2));
+}
+.caja__cara--dorso {
+  transform: rotateY(180deg) translateZ(calc(var(--d) / 2));
+}
+.caja__cara--izq,
+.caja__cara--der {
+  width: var(--d);
+  left: calc((var(--w) - var(--d)) / 2);
+  filter: brightness(0.82); /* taste-skill-ignore: sombra fija de los costados, no se anima */
+}
+.caja__cara--izq {
+  transform: rotateY(-90deg) translateZ(calc(var(--w) / 2));
+}
+.caja__cara--der {
+  transform: rotateY(90deg) translateZ(calc(var(--w) / 2));
+}
+.caja__cara--base {
+  height: var(--d);
+  top: calc((var(--h) - var(--d)) / 2);
+}
+/* tapa con bisagra en el borde de atrás: --tapa 0 cerrada (acostada), 1 abierta (levantada hacia atrás) */
+@property --tapa {
+  syntax: '<number>';
+  inherits: true;
+  initial-value: 0;
+}
+.caja__tapa {
+  position: absolute;
+  left: 0;
+  top: calc((var(--h) - var(--d)) / 2);
+  width: var(--w);
+  height: var(--d);
+  transform-origin: 50% 0;
+  transform-style: preserve-3d;
+  transform: translate3d(0, calc((var(--d) - var(--h)) / 2), calc(var(--d) / -2)) rotateX(calc(90deg + var(--tapa) * 118deg));
+}
+.caja__tapa-afuera,
+.caja__tapa-dentro {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  backface-visibility: hidden;
+  pointer-events: none;
+}
+.caja__tapa-dentro {
+  transform: rotateX(180deg);
+  background: #23256a;
+}
+/* la boca: el fondo oscuro de adentro, apenas debajo de la tapa */
+.caja__boca {
+  position: absolute;
+  left: 0;
+  top: calc((var(--h) - var(--d)) / 2);
+  width: var(--w);
+  height: var(--d);
+  background: #14163f;
+  transform: rotateX(90deg) translateZ(calc(var(--h) / 2 - 3px));
+}
+.caja__cara--base {
+  transform: rotateX(-90deg) translateZ(calc(var(--h) / 2));
+  filter: brightness(0.7); /* taste-skill-ignore: sombra fija de la base */
+}
+.caja__sombra {
+  position: absolute;
+  left: 50%;
+  bottom: calc(var(--d) * 0.2);
+  width: calc(var(--w) * 1.1);
+  height: calc(var(--d) * 0.5);
+  translate: -50% 0;
+  border-radius: 50%;
+  background: radial-gradient(closest-side, rgba(43, 3, 12, 0.28), transparent);
+  pointer-events: none;
+}
+.caja__pista {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: calc(var(--d) * -0.4);
+  text-align: center;
+  font-weight: 800;
+  font-size: 13px;
+  text-transform: uppercase;
+  color: var(--bordo);
+}
 .carta {
   position: absolute;
-  width: min(30vw, 340px);
+  width: min(22vw, 300px);
   aspect-ratio: 760 / 1200;
   perspective: 1400px;
   cursor: grab;
@@ -615,10 +685,15 @@ figure {
     padding: 96px var(--m);
   }
   .mazo__mesa {
-    height: 480px;
+    height: 440px;
+    gap: 6vw;
   }
+  .caja {
+    --w: 30vw;
+  }
+  .mazo__pila,
   .carta {
-    width: min(60vw, 270px);
+    width: min(44vw, 240px);
   }
   .mazo__h {
     font-size: 17vw;
@@ -843,7 +918,8 @@ figure {
 }
 .serie__cabeza {
   display: grid;
-  grid-template-columns: 1fr auto;
+  grid-template-columns: auto minmax(0, 1fr);
+  column-gap: clamp(32px, 5vw, 96px);
   align-items: end;
   gap: 24px;
   padding: 0 var(--m) 12px;
@@ -855,16 +931,23 @@ figure {
   order: 2;
   text-align: right;
 }
-.serie[data-lado='der'] .serie__bajada {
-  text-align: left;
-}
 .serie__titulo {
   font-size: clamp(56px, 8vw, 140px);
 }
 .serie__bajada {
-  max-width: 30ch;
+  max-width: 64ch;
   margin: 0;
-  text-align: right;
+  text-align: left;
+  text-wrap: pretty;
+  /* los textos de Abril son párrafos: se leen en caja baja, no como etiqueta */
+  font-weight: 400;
+  font-size: 16px;
+  line-height: 1.4;
+  text-transform: none;
+  letter-spacing: 0;
+}
+.serie__bajada b {
+  font-weight: 800;
 }
 .serie[data-fondo='claro'] .serie__bajada b,
 .serie[data-fondo='rosa'] .serie__bajada b {
@@ -1807,8 +1890,6 @@ img.sobre__foto {
 }
 
 /* ---------- Correcciones 15/11 ---------- */
-/* portada: las piezas de fondo van en blanco y negro (ya vienen grises en las -xs.webp,
-   así la GPU no aplica un filtro a 14 capas que se mueven en cada cuadro) */
 .tira[data-arrastrando] {
   cursor: grabbing;
 }
@@ -1959,5 +2040,1230 @@ img.sobre__foto {
   .vista__piezas img {
     max-height: 86svh;
     max-width: calc((100vw - (var(--cols, 1) + 1) * var(--m)) / var(--cols, 1));
+  }
+}
+
+
+/* palabras clave de los textos de Fotografía: más angostas y gruesas, con una pasada de fibra */
+.serie {
+  --fibra: rgba(255, 79, 163, 0.42);
+}
+.serie[data-fondo='cherry'] {
+  --fibra: var(--bordo);
+}
+.serie[data-fondo='bordo'] {
+  --fibra: var(--cherry);
+}
+.serie__bajada mark {
+  color: inherit;
+  font-weight: 800;
+  font-stretch: 75%;
+  font-size: 1.12em;
+  padding: 0 0.12em;
+  background: linear-gradient(transparent 52%, var(--fibra) 52%, var(--fibra) 90%, transparent 90%);
+  -webkit-box-decoration-break: clone;
+  box-decoration-break: clone;
+}
+.serie[data-lado='der'] .serie__cabeza {
+  grid-template-columns: minmax(0, 1fr) auto;
+}
+@media (max-width: 860px) {
+  .serie[data-lado='der'] .serie__cabeza {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* ---------- Mazo con aire: el texto más angosto y la mesa más ancha ---------- */
+.mazo {
+  grid-template-columns: minmax(0, 0.8fr) minmax(0, 1.2fr);
+  gap: clamp(40px, 5vw, 96px);
+}
+.mazo__mesa {
+  gap: clamp(56px, 7vw, 120px);
+}
+/* la caja un poco más abajo que las cartas, para que no queden en fila como en una góndola */
+.mazo__mesa .caja {
+  translate: 0 8%;
+}
+@media (max-width: 860px) {
+  .mazo {
+    grid-template-columns: 1fr;
+  }
+  /* en celu, una cosa debajo de la otra: primero el mazo, después la caja */
+  .mazo__mesa {
+    height: auto;
+    flex-direction: column;
+    gap: 40px;
+    padding-top: 12px;
+  }
+  .mazo__mesa .caja {
+    order: 2;
+    translate: none;
+    --w: 42vw;
+  }
+  .mazo__pila,
+  .carta {
+    width: min(62vw, 270px);
+  }
+}
+.mazo__h {
+  font-size: clamp(64px, 7.4vw, 128px);
+}
+@media (max-width: 860px) {
+  .mazo__h {
+    font-size: 17vw;
+  }
+}
+/* el título deriva con el scroll: más espacio y el texto siempre por encima */
+.serie__cabeza {
+  column-gap: clamp(48px, 8vw, 160px);
+}
+.serie__bajada {
+  position: relative;
+  z-index: 1;
+}
+
+/* ---------- El Principito (2026-11-23): caja y cartas al centro, textos en las esquinas ---------- */
+.principito {
+  --cw: min(17vw, 260px, 42svh * 760 / 1200);
+  --ch: calc(var(--cw) * 1200 / 760);
+  --arriba: var(--claro);
+  position: relative;
+  height: 100svh;
+  min-height: 680px;
+  background: var(--rosa) url(/tex/grano.webp);
+  color: var(--bordo);
+  overflow: hidden;
+}
+.principito::before {
+  content: '';
+  position: absolute;
+  z-index: 1;
+  left: 0;
+  right: 0;
+  top: -2px;
+  height: 36px;
+  background: url(/tex/grano.webp), var(--arriba);
+  -webkit-mask: url(/tex/costura.png) repeat-x 0 0 / auto 36px;
+  mask: url(/tex/costura.png) repeat-x 0 0 / auto 36px;
+  pointer-events: none;
+}
+.principito__objeto {
+  position: absolute;
+  inset: 0;
+}
+/* la caja en reposo queda en el centro; el scroll la agranda al principio y la lleva a su lugar */
+.principito__caja {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 5;
+  pointer-events: none;
+  transform-origin: 50% 50%;
+  will-change: transform;
+}
+.principito__caja .caja {
+  --w: min(18vw, 270px, 38svh * 720 / 1020);
+  pointer-events: auto;
+}
+.principito__salida {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: var(--cw);
+  height: var(--ch);
+  visibility: hidden;
+  transform-origin: 50% 50%;
+  will-change: transform;
+}
+.principito__salida .carta {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+}
+.principito[data-fase='saliendo'] .carta,
+.principito[data-fase='cerrada'] .carta {
+  cursor: default;
+}
+.principito__esquina {
+  position: absolute;
+  z-index: 20;
+  margin: 0;
+}
+.principito__esquina--titulo {
+  top: 92px;
+  left: var(--m);
+}
+.principito__esquina--texto {
+  left: var(--m);
+  bottom: 32px;
+}
+.principito__esquina--botones {
+  right: var(--m);
+  bottom: 32px;
+  width: min(380px, 32vw);
+  display: grid;
+  gap: 12px;
+}
+.principito__disc {
+  margin: 0 0 10px;
+  font-weight: 800;
+  font-size: 13px;
+  text-transform: uppercase;
+}
+.principito__titulo {
+  margin: 0;
+  font-weight: 900;
+  font-stretch: 62%;
+  text-transform: uppercase;
+  line-height: 0.82;
+  letter-spacing: -0.005em;
+  font-size: clamp(44px, 4.6vw, 80px);
+  color: var(--cherry);
+}
+.principito__desc {
+  max-width: min(600px, 46vw); /* ancho: pocas líneas, no un bloque angosto */
+  font-size: 14px;
+  line-height: 1.45;
+  text-wrap: pretty;
+}
+.principito .disco__celdas > * {
+  min-height: 56px;
+}
+.principito .disco__celdas button:disabled {
+  opacity: 0.45;
+  cursor: default;
+}
+.principito__pista {
+  margin: 0;
+  text-align: right;
+  font-weight: 800;
+  font-size: 12px;
+  text-transform: uppercase;
+}
+@media (max-width: 860px) {
+  /* celu: todo en columna; el título arriba, la caja y las cartas, y abajo el texto y los botones */
+  .principito {
+    --cw: 38vw;
+    height: auto;
+    min-height: 0;
+    display: flex;
+    flex-direction: column;
+    padding: 80px var(--m) 48px;
+    gap: 20px;
+  }
+  .principito__esquina {
+    position: static;
+    width: auto;
+  }
+  .principito__esquina--titulo {
+    order: 1;
+  }
+  .principito__objeto {
+    position: relative;
+    inset: auto;
+    order: 2;
+    height: 700px;
+    margin-inline: calc(var(--m) * -1);
+  }
+  .principito__esquina--texto {
+    order: 3;
+  }
+  .principito__esquina--botones {
+    order: 4;
+  }
+  .principito__titulo {
+    font-size: 15vw;
+  }
+  .principito__pista {
+    text-align: left;
+  }
+  .principito__caja .caja {
+    --w: 40vw;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .caja__tapa {
+    transition: none;
+  }
+}
+
+/* Fotografía viene después: la costura baja del rosa */
+.fotos__portada {
+  position: relative;
+}
+.fotos__portada::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: -2px;
+  height: 36px;
+  background: url(/tex/grano.webp), var(--rosa);
+  -webkit-mask: url(/tex/costura.png) repeat-x 0 0 / auto 36px;
+  mask: url(/tex/costura.png) repeat-x 0 0 / auto 36px;
+  pointer-events: none;
+}
+@media (max-width: 860px) {
+  .principito {
+    --cw: 38vw;
+    grid-template-columns: 1fr;
+    height: auto;
+    min-height: 0;
+  }
+  .principito__info {
+    padding: 88px var(--m) 8px;
+    gap: 24px;
+  }
+  .principito__titulo {
+    font-size: 17vw;
+  }
+  .principito__objeto {
+    height: 720px;
+  }
+  .principito__caja {
+    right: 0;
+    left: 0;
+    bottom: 96px;
+    display: flex;
+    justify-content: center;
+  }
+  .principito__caja .caja {
+    --w: 40vw;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .caja__tapa {
+    transition: none;
+  }
+}
+
+/* sin la barra de scroll del costado (se sigue pudiendo scrollear con la rueda, el dedo y el teclado) */
+html {
+  scrollbar-width: none;
+}
+html::-webkit-scrollbar {
+  display: none;
+}
+
+/* El Principito y Tarot: las esquinas se alinean con la composición (--borde), no con el borde de la pantalla;
+   los botones van chicos arriba a la derecha y el texto abajo a lo ancho, en pocas líneas */
+.principito {
+  --borde: var(--m);
+}
+.principito__esquina--titulo {
+  left: max(var(--m), var(--borde));
+}
+.principito__esquina--botones {
+  top: 104px;
+  bottom: auto;
+  right: max(var(--m), var(--borde));
+  width: auto;
+}
+.principito__esquina--texto {
+  left: max(var(--m), var(--borde));
+  right: max(var(--m), var(--borde));
+  bottom: 40px;
+}
+.principito__esquina--texto.principito__desc {
+  max-width: 78ch;
+  font-size: 15px;
+}
+.principito__esquina--pista {
+  right: max(var(--m), var(--borde));
+  top: 160px;
+}
+.principito .disco__celdas,
+.tarot .disco__celdas {
+  grid-template-columns: auto auto;
+  gap: 6px;
+}
+.principito .disco__celdas > *,
+.tarot .disco__celdas > * {
+  min-height: 44px;
+  padding: 0 16px;
+  font-size: 12px;
+}
+@media (max-width: 860px) {
+  .principito__esquina--texto.principito__desc {
+    font-size: 14px;
+  }
+  .principito .disco__celdas,
+  .tarot .disco__celdas {
+    grid-template-columns: 1fr 1fr;
+  }
+  .principito .disco__celdas > *,
+  .tarot .disco__celdas > * {
+    min-height: 52px;
+  }
+}
+@media (max-width: 860px) {
+  .principito__esquina--pista {
+    order: 3;
+  }
+  .principito__esquina--texto {
+    order: 4;
+  }
+  .principito__esquina--botones {
+    order: 5;
+  }
+}
+
+/* =====================================================================
+   Sitio en varias páginas (2026-11-23): categorías en el inicio,
+   página de cada categoría, tarot.
+   ===================================================================== */
+
+/* ---------- Inicio: lista de categorías ---------- */
+.cats {
+  --arriba: var(--rosa);
+  position: relative;
+  padding: 110px var(--m) 96px;
+  background: var(--cherry) url(/tex/grano.webp);
+  color: var(--claro);
+  overflow: hidden;
+}
+.cats::before,
+.catc::before,
+.pliego2::before,
+.catc__sig::before,
+.tarot::before {
+  content: '';
+  position: absolute;
+  z-index: 1;
+  left: 0;
+  right: 0;
+  top: -2px;
+  height: 36px;
+  background: url(/tex/grano.webp), var(--arriba);
+  -webkit-mask: url(/tex/costura.png) repeat-x 0 0 / auto 36px;
+  mask: url(/tex/costura.png) repeat-x 0 0 / auto 36px;
+  pointer-events: none;
+}
+.cats__cabeza {
+  display: flex;
+  align-items: end;
+  justify-content: space-between;
+  gap: 24px;
+  margin-bottom: 28px;
+}
+.cats__h {
+  margin: 0;
+  font-weight: 900;
+  font-stretch: 62%;
+  text-transform: uppercase;
+  line-height: 0.82;
+  font-size: clamp(40px, 4.6vw, 80px);
+}
+.cats__cuenta {
+  margin: 0;
+  font-weight: 800;
+  font-size: 13px;
+  text-transform: uppercase;
+}
+/* ---------- Página de una categoría ---------- */
+.catc {
+  --arriba: var(--claro);
+  position: relative;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 40ch);
+  align-items: end;
+  gap: 32px;
+  padding: 132px var(--m) 44px;
+  background: var(--cherry) url(/tex/grano.webp);
+  color: var(--claro);
+}
+.catc::before {
+  display: none; /* es lo primero de la página: no hay sección arriba */
+}
+.catc__volver {
+  position: absolute;
+  top: 76px;
+  left: var(--m);
+  color: inherit;
+  font-weight: 800;
+  font-size: 13px;
+  text-transform: uppercase;
+  text-decoration: underline;
+  text-decoration-thickness: 2px;
+  text-underline-offset: 4px;
+}
+.catc__texto {
+  display: contents;
+}
+.catc__h {
+  margin: 0;
+  font-weight: 900;
+  font-stretch: 62%;
+  text-transform: uppercase;
+  line-height: 0.82;
+  font-size: clamp(72px, 12vw, 210px);
+}
+.catc__cuenta {
+  margin: 0 0 6px;
+  max-width: 48ch;
+  justify-self: end;
+  text-align: right;
+  font-weight: 800;
+  font-size: 14px;
+  text-transform: uppercase;
+}
+.catc__portada {
+  height: min(58svh, 540px);
+  width: auto;
+  rotate: 2deg;
+}
+@media (max-width: 860px) {
+  .catc {
+    grid-template-columns: 1fr;
+    min-height: 0;
+    padding-top: 112px;
+  }
+  .catc__portada {
+    order: -1;
+    height: 40svh;
+    justify-self: center;
+  }
+  .catc__h {
+    font-size: 17vw;
+  }
+}
+[data-cat] .principito {
+  --arriba: var(--cherry);
+}
+
+/* un pliego por proyecto, con los colores del sitio en orden */
+.pliego2 {
+  position: relative;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  align-items: stretch;
+  min-height: 100svh;
+  background: var(--fondo) url(/tex/grano.webp);
+  color: var(--tinta);
+}
+.pliego2[data-lado='der'] .pliego2__pieza {
+  order: 2;
+}
+.pliego2__pieza {
+  display: grid;
+  place-items: center;
+  padding: 88px var(--m) 56px;
+  border: 0;
+  background: none;
+  cursor: zoom-in;
+}
+.pliego2__pieza img {
+  max-height: 80svh;
+  max-width: 100%;
+  width: auto;
+  height: auto;
+  transition: transform 260ms cubic-bezier(0.23, 1, 0.32, 1);
+}
+@media (hover: hover) {
+  .pliego2__pieza:hover img {
+    transform: scale(1.015);
+  }
+}
+.pliego2__pieza:focus-visible {
+  outline: 3px solid var(--tinta);
+  outline-offset: -12px;
+}
+.pliego2__info {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  gap: 40px;
+  padding: 110px var(--m) 56px;
+}
+.pliego2__disc {
+  margin: 0;
+  font-weight: 800;
+  font-size: 13px;
+  text-transform: uppercase;
+}
+.pliego2__titulo {
+  margin: 0 0 22px;
+  font-weight: 900;
+  font-stretch: 62%;
+  text-transform: uppercase;
+  line-height: 0.82;
+  font-size: clamp(60px, 7vw, 120px);
+}
+.pliego2__texto {
+  margin: 0;
+  max-width: 52ch;
+  text-wrap: pretty;
+}
+.pliego2__botones button {
+  min-height: 60px;
+  padding: 0 24px;
+  border: 0;
+  background: var(--tinta);
+  color: var(--fondo);
+  font: 800 14px / 1.1 var(--font-sans);
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: transform 160ms cubic-bezier(0.23, 1, 0.32, 1);
+}
+.pliego2__botones button:active {
+  transform: scale(0.97);
+}
+.pliego2__botones button:focus-visible {
+  outline: 3px solid var(--tinta);
+  outline-offset: 3px;
+}
+@media (max-width: 860px) {
+  .pliego2 {
+    grid-template-columns: 1fr;
+    min-height: 0;
+  }
+  .pliego2[data-lado='der'] .pliego2__pieza {
+    order: 0;
+  }
+  .pliego2__pieza {
+    padding: 72px var(--m) 8px;
+  }
+  .pliego2__pieza img {
+    max-height: 70svh;
+  }
+  .pliego2__info {
+    padding: 24px var(--m) 56px;
+    gap: 24px;
+  }
+  .pliego2__titulo {
+    font-size: 16vw;
+  }
+}
+
+/* siguiente categoría */
+.catc__sig {
+  position: relative;
+  background: var(--bordo) url(/tex/grano.webp);
+  color: var(--rosa);
+}
+.catc__sig button {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  grid-template-rows: auto auto;
+  align-items: end;
+  gap: 8px 32px;
+  width: 100%;
+  padding: 96px var(--m) 64px;
+  border: 0;
+  background: none;
+  color: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+.catc__sig small {
+  font-weight: 800;
+  font-size: 13px;
+  text-transform: uppercase;
+}
+.catc__sig strong {
+  grid-row: 2;
+  font-weight: 900;
+  font-stretch: 62%;
+  text-transform: uppercase;
+  line-height: 0.82;
+  font-size: clamp(64px, 10vw, 180px);
+  transition: transform 260ms cubic-bezier(0.23, 1, 0.32, 1);
+}
+.catc__sig img {
+  grid-row: 1 / span 2;
+  grid-column: 2;
+  height: clamp(120px, 22vw, 240px);
+  width: auto;
+  rotate: -3deg;
+}
+@media (hover: hover) {
+  .catc__sig button:hover strong {
+    transform: translateX(16px);
+  }
+}
+.catc__sig button:focus-visible {
+  outline: 3px solid var(--rosa);
+  outline-offset: -10px;
+}
+
+/* ---------- Tarot ---------- */
+.tarot {
+  --tw: min(15vw, 230px, 44svh * 945 / 1417);
+  --tg: 28px;
+  --borde: max(var(--m), calc((100% - (4 * var(--tw) + 3 * var(--tg))) / 2));
+  --arriba: var(--rosa);
+  position: relative;
+  height: 100svh;
+  min-height: 680px;
+  background: var(--bordo) url(/tex/grano.webp);
+  color: var(--rosa);
+  overflow: hidden;
+}
+.tarot__mesa {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--tg);
+}
+.tarot__carta {
+  width: var(--tw);
+  aspect-ratio: 945 / 1417;
+  padding: 0;
+  border: 0;
+  background: none;
+  cursor: pointer;
+  perspective: 1400px;
+  -webkit-tap-highlight-color: transparent;
+}
+.tarot__carta:focus-visible {
+  outline: 3px solid var(--rosa);
+  outline-offset: 6px;
+}
+.tarot__cuerpo {
+  display: block;
+  position: relative;
+  width: 100%;
+  height: 100%;
+  transform-style: preserve-3d;
+  transition: transform 620ms cubic-bezier(0.23, 1, 0.32, 1);
+}
+.tarot__carta[data-flip] .tarot__cuerpo {
+  transform: rotateY(180deg);
+}
+.tarot__cara {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: 6px;
+  backface-visibility: hidden;
+  pointer-events: none;
+}
+.tarot__cara--dorso {
+  transform: rotateY(180deg);
+}
+.tarot__esquina {
+  position: absolute;
+  z-index: 2;
+  margin: 0;
+}
+.tarot__esquina--titulo {
+  top: 92px;
+  left: var(--borde);
+}
+.tarot__esquina--botones {
+  top: 104px;
+  right: var(--borde);
+  display: grid;
+  justify-items: end;
+  gap: 10px;
+}
+.tarot__esquina--texto {
+  left: var(--borde);
+  right: var(--borde);
+  bottom: 40px;
+  max-width: 78ch;
+}
+.tarot__disc {
+  margin: 0 0 10px;
+  font-weight: 800;
+  font-size: 13px;
+  text-transform: uppercase;
+}
+.tarot__titulo {
+  margin: 0;
+  font-weight: 900;
+  font-stretch: 62%;
+  text-transform: uppercase;
+  line-height: 0.82;
+  font-size: clamp(44px, 4.6vw, 80px);
+  color: var(--rosa);
+}
+.tarot__desc {
+  font-size: 15px;
+  line-height: 1.45;
+  text-wrap: pretty;
+}
+.tarot__pista {
+  margin: 0;
+  font-weight: 800;
+  font-size: 12px;
+  text-transform: uppercase;
+}
+.tarot .disco__celdas > :last-child {
+  background: var(--rosa);
+  color: var(--bordo);
+}
+@media (max-width: 860px) {
+  .tarot {
+    height: auto;
+    min-height: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    padding: 80px var(--m) 56px;
+  }
+  .tarot__esquina {
+    position: static;
+  }
+  .tarot__esquina--titulo {
+    order: 1;
+  }
+  .tarot__mesa {
+    position: static;
+    order: 2;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 14px;
+    justify-items: center;
+  }
+  .tarot__carta {
+    width: 100%;
+  }
+  .tarot__esquina--texto {
+    order: 3;
+  }
+  .tarot__esquina--botones {
+    order: 4;
+    justify-items: stretch;
+  }
+  .tarot__titulo {
+    font-size: 15vw;
+  }
+  .tarot__desc {
+    font-size: 14px;
+  }
+}
+
+/* ---------- Inicio: la mesa de objetos (2026-11-23, reemplaza la lista de texto) ---------- */
+.cats {
+  background: var(--claro) url(/tex/grano.webp);
+  color: var(--bordo);
+  overflow: hidden;
+  padding-bottom: 72px;
+}
+.cats__h {
+  color: var(--cherry);
+}
+.mesa2 {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 24px clamp(24px, 3vw, 56px);
+}
+.mesa2__lugar {
+  position: relative;
+}
+.mesa2__lugar:hover,
+.mesa2__lugar:focus-within {
+  z-index: 2; /* el objeto abierto pasa por encima de los vecinos */
+}
+.cat2 {
+  display: block;
+  color: inherit;
+  text-decoration: none;
+  outline: none;
+}
+.obj {
+  position: relative;
+  display: block;
+  aspect-ratio: 4 / 3.3;
+}
+.obj__capa {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: var(--w);
+  height: auto;
+  aspect-ratio: var(--ar);
+  object-fit: cover;
+  transform: translate(-50%, -50%) translate(var(--x), var(--y)) rotate(var(--r));
+  transition: transform 560ms cubic-bezier(0.23, 1, 0.32, 1);
+  box-shadow: 0 14px 26px -18px rgba(43, 3, 12, 0.55);
+  user-select: none;
+}
+.obj__vinilo {
+  border-radius: 50%;
+}
+.obj__vinilo svg {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+@media (hover: hover) {
+  .cat2:hover .obj__capa {
+    transform: translate(-50%, -50%) translate(var(--hx), var(--hy)) rotate(var(--hr));
+  }
+}
+.cat2:focus-visible .obj__capa {
+  transform: translate(-50%, -50%) translate(var(--hx), var(--hy)) rotate(var(--hr));
+}
+.cat2:active .obj {
+  scale: 0.985;
+}
+.cat2__pie {
+  display: grid;
+  gap: 6px;
+  margin-top: 14px;
+  padding-top: 12px;
+  border-top: 2px solid currentColor;
+}
+.cat2__nombre {
+  font-weight: 900;
+  font-stretch: 62%;
+  text-transform: uppercase;
+  line-height: 0.86;
+  font-size: clamp(36px, 3.6vw, 64px);
+  color: var(--cherry);
+  transition: transform 260ms cubic-bezier(0.23, 1, 0.32, 1);
+}
+@media (hover: hover) {
+  .cat2:hover .cat2__nombre {
+    transform: translateX(8px);
+  }
+}
+.cat2:focus-visible .cat2__nombre {
+  text-decoration: underline;
+  text-decoration-thickness: 3px;
+  text-underline-offset: 6px;
+}
+.cat2__lista {
+  font-weight: 800;
+  font-size: 12px;
+  text-transform: uppercase;
+  line-height: 1.35;
+}
+@media (max-width: 860px) {
+  .mesa2 {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 28px 16px;
+  }
+  .cat2__nombre {
+    font-size: 8.4vw;
+  }
+  .cat2__lista {
+    font-size: 10px;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .obj__capa,
+  .cat2__nombre {
+    transition: none;
+  }
+}
+@media (max-width: 860px) {
+  .cats__cabeza {
+    flex-direction: column;
+    align-items: start;
+    gap: 8px;
+  }
+  .cats__h {
+    font-size: 15vw;
+  }
+}
+
+/* Sin costuras de puntos entre colores (Giuli, 2026-11-23): los cambios de color son un corte limpio.
+   Apaga todos los ::before de costura de arriba; costura.png queda sin uso. */
+.carru::before,
+.disco::before,
+.serie[data-costura]::before,
+.cierre::before,
+.cats::before,
+.catc::before,
+.pliego2::before,
+.catc__sig::before,
+.tarot::before,
+.principito::before,
+.fotos__portada::before {
+  content: none;
+  display: none;
+}
+
+/* ---------- Marca y papelería: Patagonia (2026-11-23, v2: objeto al centro, textos en las esquinas) ---------- */
+.marca {
+  --crema: #ede5d9;
+  --madera: #bd9d7b;
+  --corteza: #211305;
+}
+.signo {
+  display: block;
+  aspect-ratio: var(--ar);
+  -webkit-mask: var(--src) center / contain no-repeat;
+  mask: var(--src) center / contain no-repeat;
+}
+/* 1. del boceto a la marca */
+.proceso {
+  position: relative;
+  height: 100svh;
+  min-height: 620px;
+  background: var(--corteza);
+  color: var(--crema);
+  overflow: hidden;
+}
+.proceso__escena {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+}
+.proceso__capa {
+  grid-area: 1 / 1;
+  margin: 0;
+  will-change: transform, opacity;
+}
+.proceso__capa--mano img {
+  display: block;
+  width: min(54vw, 760px, 90svh);
+  height: auto;
+  rotate: -2deg;
+}
+.proceso__capa--digital {
+  display: flex;
+  align-items: end;
+  gap: clamp(20px, 3vw, 56px);
+}
+.proceso__capa--digital .signo {
+  height: min(44svh, 380px);
+}
+.proceso__capa--grilla img {
+  display: block;
+  height: min(62svh, 560px);
+  width: auto;
+  padding: 28px;
+  background: var(--crema);
+}
+.proceso__isotipo {
+  height: min(64svh, 580px);
+}
+.proceso__esquina {
+  position: absolute;
+  z-index: 2;
+  margin: 0;
+}
+.proceso__esquina--titulo {
+  top: 96px;
+  left: var(--m);
+}
+.proceso__esquina--paleta {
+  top: 104px;
+  right: var(--m);
+  list-style: none;
+  padding: 0;
+  display: grid;
+  gap: 10px;
+  font-weight: 800;
+  font-size: 12px;
+  text-transform: uppercase;
+}
+.proceso__esquina--paleta li {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.proceso__esquina--paleta b {
+  margin-right: 6px;
+}
+.proceso__chip {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  border: 1.5px solid var(--crema);
+}
+.proceso__esquina--paso {
+  left: var(--m);
+  bottom: 36px;
+  font-weight: 800;
+  font-size: 14px;
+  text-transform: uppercase;
+}
+.proceso__esquina--paso b {
+  margin-right: 10px;
+  color: var(--madera);
+}
+.proceso__esquina--pista {
+  right: var(--m);
+  bottom: 36px;
+  font-weight: 800;
+  font-size: 12px;
+  text-transform: uppercase;
+  opacity: 0.7;
+}
+.proceso__disc {
+  margin: 0 0 10px;
+  font-weight: 800;
+  font-size: 13px;
+  text-transform: uppercase;
+}
+.proceso__titulo {
+  margin: 0;
+  font-weight: 900;
+  font-stretch: 62%;
+  text-transform: uppercase;
+  line-height: 0.82;
+  font-size: clamp(48px, 5vw, 90px);
+}
+/* 2. aplicaciones */
+.aplic {
+  position: relative;
+  min-height: 100svh;
+  display: grid;
+  grid-template-rows: auto 1fr;
+  gap: 32px;
+  padding: 96px var(--m) 64px;
+  background: var(--madera);
+  color: var(--corteza);
+}
+.aplic__mesa {
+  display: grid;
+  grid-template-columns: minmax(0, 0.8fr) minmax(0, 1.2fr);
+  align-items: center;
+  gap: clamp(24px, 4vw, 72px);
+}
+.aplic figure {
+  margin: 0;
+}
+.aplic figcaption {
+  margin-top: 14px;
+  font-weight: 800;
+  font-size: 13px;
+  text-transform: uppercase;
+}
+.aplic__maqueta img {
+  display: block;
+  width: 100%;
+  max-height: 66svh;
+  object-fit: cover;
+}
+.aplic__papeleria {
+  position: relative;
+  height: min(66svh, 620px);
+  outline: none;
+}
+.aplic__papeleria figcaption {
+  position: absolute;
+  left: 0;
+  bottom: -32px;
+}
+.aplic__pieza {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  height: auto;
+  box-shadow: 0 22px 36px -24px rgba(33, 19, 5, 0.7);
+  transform: translate(-50%, -50%) translate(var(--x), var(--y)) rotate(var(--r));
+  transition: transform 620ms cubic-bezier(0.23, 1, 0.32, 1);
+}
+.aplic__pieza--hoja { width: 38%; --x: -46%; --y: -4%; --r: -4deg; --hx: -78%; --hy: -6%; --hr: -6deg; }
+.aplic__pieza--sobre { width: 62%; --x: 22%; --y: -40%; --r: 3deg; --hx: 30%; --hy: -64%; --hr: 4deg; }
+.aplic__pieza--tarjeta { width: 30%; --x: 14%; --y: 62%; --r: 6deg; --hx: 30%; --hy: 96%; --hr: 9deg; }
+.aplic__pieza--tarjeta2 { width: 30%; --x: 96%; --y: 30%; --r: -7deg; --hx: 140%; --hy: 40%; --hr: -10deg; }
+@media (hover: hover) {
+  .aplic__papeleria:hover .aplic__pieza {
+    transform: translate(-50%, -50%) translate(var(--hx), var(--hy)) rotate(var(--hr));
+  }
+}
+.aplic__papeleria:focus-visible .aplic__pieza {
+  transform: translate(-50%, -50%) translate(var(--hx), var(--hy)) rotate(var(--hr));
+}
+@media (max-width: 860px) {
+  .proceso__titulo {
+    font-size: 13vw;
+  }
+  .proceso__esquina--titulo {
+    top: 80px;
+  }
+  .proceso__esquina--paleta {
+    top: auto;
+    bottom: 76px;
+    left: var(--m);
+    right: auto;
+    display: flex;
+    gap: 8px;
+  }
+  .proceso__esquina--paleta li span:last-child {
+    display: none;
+  }
+  .proceso__esquina--pista {
+    display: none;
+  }
+  .proceso__capa--mano img {
+    width: 90vw;
+  }
+  .proceso__capa--digital .signo {
+    height: 30vw;
+  }
+  .proceso__capa--grilla img,
+  .proceso__isotipo {
+    height: 48svh;
+  }
+  .aplic__mesa {
+    grid-template-columns: 1fr;
+  }
+  .aplic__papeleria {
+    height: 92vw;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .aplic__pieza {
+    transition: none;
+  }
+}
+
+/* Menú: "Abril Wisspi" al centro (siempre vuelve al inicio); a la izquierda, dónde estás */
+.nav__donde {
+  justify-self: start;
+}
+.nav__marca--centro {
+  justify-self: center;
+  font-weight: 900;
+  font-size: 15px;
+  text-transform: uppercase;
+}
+@media (max-width: 760px) {
+  .nav {
+    grid-template-columns: auto 1fr;
+  }
+  .nav__donde {
+    display: none;
+  }
+  .nav__marca--centro {
+    justify-self: start;
+  }
+}
+
+/* Jerarquía en los proyectos (2026-11-23): el título manda; el texto que lo acompaña es texto común,
+   no una entrada grande. Más ancho y con más aire entre líneas para que no sea un bloque. */
+.vista__texto,
+.pliego2__texto,
+.disco__desc {
+  font-size: 16px;
+  line-height: 1.55;
+  max-width: 56ch;
+}
+.vista__disc {
+  margin-bottom: 12px;
+}
+@media (max-width: 860px) {
+  .vista__texto,
+  .pliego2__texto,
+  .disco__desc {
+    font-size: 15px;
+  }
+}
+@media (max-width: 860px) {
+  .catc__sig strong {
+    font-size: 14vw;
+  }
+  .catc__sig img {
+    height: 96px;
   }
 }

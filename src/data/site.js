@@ -5,6 +5,7 @@ export const site = {
   nombre: 'Abril',
   apellido: 'Wisspi',
   rol: 'Estudiante de diseño gráfico',
+  disciplinas: ['Diseño de comunicación visual', 'Diseño UX/UI'], // abajo en la portada
   frase: 'Diseño afiches, packaging, discos y piezas para redes. También saco las fotos.',
   mail: '',
   instagram: '',

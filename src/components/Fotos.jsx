@@ -1,5 +1,8 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
-import { series, reels } from '../data/fotos'
+import { series, reels, reelsBajada } from '../data/fotos'
+
+// Las palabras clave van entre **asteriscos** en los datos y se resaltan como con fibra.
+const conClaves = (t) => t.split(/\*\*(.+?)\*\*/g).map((x, i) => (i % 2 ? <mark key={i}>{x}</mark> : x))
 import { img } from '../data/site'
 import { transicion, getLenis, reduce } from '../lib/motion'
 import { useArrastre } from '../lib/arrastre'
@@ -105,7 +108,7 @@ function Tira({ s, abrir }) {
   )
 }
 
-export default function Fotos() {
+export default function Fotos({ sinCabeza = false }) {
   const [abierta, setAbierta] = useState(null) // { s, i }
 
   const abrir = (s, i, el) => transicion(() => setAbierta({ s, i }), { from: el })
@@ -132,12 +135,17 @@ export default function Fotos() {
 
   return (
     <section className="fotos" id="fotografia" aria-labelledby="fotos-h">
-      <header className="fotos__portada">
-        <h2 className="fotos__h" id="fotos-h" data-titulo><span>Fotografía</span></h2>
-        <p className="fotos__cuenta" data-reveal style={{ '--i': 1 }}>
-          ({series.length + 1}) series: books, estudio, producto, repostería y reels
-        </p>
-      </header>
+      {/* dentro de la página de la categoría el título ya está arriba */}
+      {sinCabeza ? (
+        <h2 className="sr-only" id="fotos-h">Fotografía</h2>
+      ) : (
+        <header className="fotos__portada">
+          <h2 className="fotos__h" id="fotos-h" data-titulo><span>Fotografía</span></h2>
+          <p className="fotos__cuenta" data-reveal style={{ '--i': 1 }}>
+            ({series.length + 1}) series: books, estudio, producto, repostería y reels
+          </p>
+        </header>
+      )}
 
       {series.map((s, k) => {
         const arriba = k === 0 ? 'claro' : series[k - 1].fondo
@@ -154,7 +162,7 @@ export default function Fotos() {
           <header className="serie__cabeza">
             <h3 className="serie__titulo" id={`serie-${s.id}`} data-titulo data-deriva={k % 2 ? 1 : -1}><span>{s.nombre}</span></h3>
             <p className="serie__bajada" data-reveal style={{ '--i': 1 }}>
-              <b>({s.fotos.length})</b> {s.bajada}
+              <b>({s.fotos.length})</b> {conClaves(s.bajada)}
             </p>
           </header>
           <Tira s={s} abrir={abrir} />
@@ -166,7 +174,7 @@ export default function Fotos() {
         <header className="serie__cabeza">
           <h3 className="serie__titulo" id="serie-reels" data-titulo data-deriva="-1"><span>Reels</span></h3>
           <p className="serie__bajada" data-reveal style={{ '--i': 1 }}>
-            <b>({reels.length})</b> Reels para una repostería, sin sonido.
+            <b>({reels.length})</b> {conClaves(reelsBajada)}
           </p>
         </header>
         <div className="reels">
