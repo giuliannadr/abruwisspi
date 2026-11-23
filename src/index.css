@@ -2988,233 +2988,180 @@ html::-webkit-scrollbar {
   display: none;
 }
 
-/* ---------- Marca y papelería: Patagonia (2026-11-23, v2: objeto al centro, textos en las esquinas) ---------- */
-.marca {
-  --crema: #ede5d9;
-  --madera: #bd9d7b;
-  --corteza: #211305;
-}
+/* ---------- Marca y papelería: Patagonia (v3, 2026-11-23): estudio de marca limpio sobre el papel claro ---------- */
 .signo {
   display: block;
   aspect-ratio: var(--ar);
   -webkit-mask: var(--src) center / contain no-repeat;
   mask: var(--src) center / contain no-repeat;
 }
-/* 1. del boceto a la marca */
-.proceso {
-  position: relative;
-  height: 100svh;
-  min-height: 620px;
-  background: var(--corteza);
-  color: var(--crema);
-  overflow: hidden;
+.estudio {
+  padding: 0 var(--m) 40px;
+  background: var(--claro) url(/tex/grano.webp);
+  color: var(--bordo);
 }
-.proceso__escena {
-  position: absolute;
-  inset: 0;
-  display: grid;
-  place-items: center;
+.estudio__cabeza {
+  padding: 72px 0 40px;
 }
-.proceso__capa {
-  grid-area: 1 / 1;
-  margin: 0;
-  will-change: transform, opacity;
-}
-.proceso__capa--mano img {
-  display: block;
-  width: min(54vw, 760px, 90svh);
-  height: auto;
-  rotate: -2deg;
-}
-.proceso__capa--digital {
-  display: flex;
-  align-items: end;
-  gap: clamp(20px, 3vw, 56px);
-}
-.proceso__capa--digital .signo {
-  height: min(44svh, 380px);
-}
-.proceso__capa--grilla img {
-  display: block;
-  height: min(62svh, 560px);
-  width: auto;
-  padding: 28px;
-  background: var(--crema);
-}
-.proceso__isotipo {
-  height: min(64svh, 580px);
-}
-.proceso__esquina {
-  position: absolute;
-  z-index: 2;
-  margin: 0;
-}
-.proceso__esquina--titulo {
-  top: 96px;
-  left: var(--m);
-}
-.proceso__esquina--paleta {
-  top: 104px;
-  right: var(--m);
-  list-style: none;
-  padding: 0;
-  display: grid;
-  gap: 10px;
-  font-weight: 800;
-  font-size: 12px;
-  text-transform: uppercase;
-}
-.proceso__esquina--paleta li {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-}
-.proceso__esquina--paleta b {
-  margin-right: 6px;
-}
-.proceso__chip {
-  width: 28px;
-  height: 28px;
-  border-radius: 50%;
-  border: 1.5px solid var(--crema);
-}
-.proceso__esquina--paso {
-  left: var(--m);
-  bottom: 36px;
-  font-weight: 800;
-  font-size: 14px;
-  text-transform: uppercase;
-}
-.proceso__esquina--paso b {
-  margin-right: 10px;
-  color: var(--madera);
-}
-.proceso__esquina--pista {
-  right: var(--m);
-  bottom: 36px;
-  font-weight: 800;
-  font-size: 12px;
-  text-transform: uppercase;
-  opacity: 0.7;
-}
-.proceso__disc {
+.estudio__disc {
   margin: 0 0 10px;
   font-weight: 800;
   font-size: 13px;
   text-transform: uppercase;
 }
-.proceso__titulo {
+.estudio__titulo {
   margin: 0;
   font-weight: 900;
   font-stretch: 62%;
   text-transform: uppercase;
   line-height: 0.82;
-  font-size: clamp(48px, 5vw, 90px);
+  font-size: clamp(56px, 7vw, 120px);
+  color: var(--cherry);
 }
-/* 2. aplicaciones */
-.aplic {
-  position: relative;
-  min-height: 100svh;
-  display: grid;
-  grid-template-rows: auto 1fr;
-  gap: 32px;
-  padding: 96px var(--m) 64px;
-  background: var(--madera);
-  color: var(--corteza);
+.estudio__parte {
+  padding: 16px 0 104px;
+  border-top: 2px solid currentColor;
 }
-.aplic__mesa {
-  display: grid;
-  grid-template-columns: minmax(0, 0.8fr) minmax(0, 1.2fr);
-  align-items: center;
-  gap: clamp(24px, 4vw, 72px);
+.estudio__rotulo {
+  margin: 0 0 56px;
+  font-weight: 800;
+  font-size: 13px;
+  text-transform: uppercase;
 }
-.aplic figure {
+.estudio figure {
   margin: 0;
 }
-.aplic figcaption {
+.estudio figcaption {
+  margin-top: 12px;
+  font-weight: 800;
+  font-size: 12px;
+  text-transform: uppercase;
+}
+/* la marca: sola y centrada */
+.estudio__marca {
+  display: grid;
+  justify-items: center;
+}
+.estudio__marca .estudio__rotulo {
+  justify-self: start;
+}
+.estudio__isotipo {
+  height: min(50svh, 440px);
+}
+.estudio__logotipo {
+  width: min(340px, 64vw);
+  margin-top: 56px;
+}
+/* construcción: tres pasos del mismo tamaño */
+.estudio__tres {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: clamp(20px, 3vw, 48px);
+}
+.estudio__marco {
+  display: grid;
+  place-items: center;
+  aspect-ratio: 4 / 5;
+  padding: 28px;
+  background: rgba(255, 255, 255, 0.55);
+}
+.estudio__marco img {
+  max-width: 100%;
+  max-height: 100%;
+  width: auto;
+  height: auto;
+}
+.estudio__digital {
+  height: 72%;
+}
+/* color: tres círculos */
+.estudio__paleta {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: clamp(20px, 3vw, 48px);
+}
+.estudio__paleta li {
+  display: grid;
+  justify-items: center;
+  gap: 6px;
+  font-size: 14px;
+}
+.estudio__paleta b {
   margin-top: 14px;
   font-weight: 800;
   font-size: 13px;
   text-transform: uppercase;
 }
-.aplic__maqueta img {
+.estudio__circulo {
+  width: min(20vw, 240px);
+  aspect-ratio: 1;
+  border-radius: 50%;
+  border: 1.5px solid rgba(43, 3, 12, 0.25);
+}
+/* aplicaciones: la maqueta y la papelería, una al lado de la otra */
+.estudio__aplic {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: clamp(20px, 3vw, 48px);
+}
+.estudio__aplic > figure > img {
   display: block;
   width: 100%;
-  max-height: 66svh;
+  aspect-ratio: 4 / 5;
   object-fit: cover;
 }
-.aplic__papeleria {
+.estudio__papeleria {
   position: relative;
-  height: min(66svh, 620px);
-  outline: none;
+  aspect-ratio: 4 / 5;
+  background: #d9c6ae;
+  overflow: hidden;
 }
-.aplic__papeleria figcaption {
+.estudio__pieza {
   position: absolute;
-  left: 0;
-  bottom: -32px;
-}
-.aplic__pieza {
-  position: absolute;
-  left: 50%;
-  top: 50%;
   height: auto;
-  box-shadow: 0 22px 36px -24px rgba(33, 19, 5, 0.7);
-  transform: translate(-50%, -50%) translate(var(--x), var(--y)) rotate(var(--r));
-  transition: transform 620ms cubic-bezier(0.23, 1, 0.32, 1);
+  box-shadow: 0 18px 30px -22px rgba(33, 19, 5, 0.6);
 }
-.aplic__pieza--hoja { width: 38%; --x: -46%; --y: -4%; --r: -4deg; --hx: -78%; --hy: -6%; --hr: -6deg; }
-.aplic__pieza--sobre { width: 62%; --x: 22%; --y: -40%; --r: 3deg; --hx: 30%; --hy: -64%; --hr: 4deg; }
-.aplic__pieza--tarjeta { width: 30%; --x: 14%; --y: 62%; --r: 6deg; --hx: 30%; --hy: 96%; --hr: 9deg; }
-.aplic__pieza--tarjeta2 { width: 30%; --x: 96%; --y: 30%; --r: -7deg; --hx: 140%; --hy: 40%; --hr: -10deg; }
-@media (hover: hover) {
-  .aplic__papeleria:hover .aplic__pieza {
-    transform: translate(-50%, -50%) translate(var(--hx), var(--hy)) rotate(var(--hr));
-  }
+.estudio__pieza--hoja {
+  width: 50%;
+  left: 8%;
+  top: 7%;
+  rotate: -3deg;
 }
-.aplic__papeleria:focus-visible .aplic__pieza {
-  transform: translate(-50%, -50%) translate(var(--hx), var(--hy)) rotate(var(--hr));
+.estudio__pieza--sobre {
+  width: 72%;
+  right: -6%;
+  top: 46%;
+  rotate: 2deg;
+}
+.estudio__pieza--tarjeta {
+  width: 38%;
+  left: 16%;
+  bottom: 6%;
+  rotate: 5deg;
 }
 @media (max-width: 860px) {
-  .proceso__titulo {
-    font-size: 13vw;
+  .estudio__parte {
+    padding-bottom: 72px;
   }
-  .proceso__esquina--titulo {
-    top: 80px;
+  .estudio__rotulo {
+    margin-bottom: 32px;
   }
-  .proceso__esquina--paleta {
-    top: auto;
-    bottom: 76px;
-    left: var(--m);
-    right: auto;
-    display: flex;
-    gap: 8px;
-  }
-  .proceso__esquina--paleta li span:last-child {
-    display: none;
-  }
-  .proceso__esquina--pista {
-    display: none;
-  }
-  .proceso__capa--mano img {
-    width: 90vw;
-  }
-  .proceso__capa--digital .signo {
-    height: 30vw;
-  }
-  .proceso__capa--grilla img,
-  .proceso__isotipo {
-    height: 48svh;
-  }
-  .aplic__mesa {
+  .estudio__tres,
+  .estudio__aplic {
     grid-template-columns: 1fr;
+    gap: 32px;
   }
-  .aplic__papeleria {
-    height: 92vw;
+  .estudio__marco {
+    aspect-ratio: 4 / 3;
   }
-}
-@media (prefers-reduced-motion: reduce) {
-  .aplic__pieza {
-    transition: none;
+  .estudio__circulo {
+    width: 26vw;
+  }
+  .estudio__titulo {
+    font-size: 15vw;
   }
 }
 
