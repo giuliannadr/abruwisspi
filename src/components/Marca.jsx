@@ -46,7 +46,8 @@ export default function Marca() {
         <div className="estudio__tres">
           <figure data-reveal>
             <div className="estudio__marco">
-              <img src={P('boceto-mano.webp')} width="1600" height="1196" alt="Bocetos a mano de la letra P con vetas de madera" loading="lazy" decoding="async" />
+              {/* la tinta sola, sin el papel ni el renglón de la foto (scratchpad: separada por color) */}
+              <Signo src="boceto-mano-tinta.png" ar={1254 / 986} className="estudio__mano" label="Bocetos a mano de la letra P con vetas de madera" />
             </div>
             <figcaption>Boceto a mano</figcaption>
           </figure>

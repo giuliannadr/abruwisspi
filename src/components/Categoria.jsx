@@ -3,7 +3,6 @@ import { porId, temas } from '../data/proyectos'
 import { img } from '../data/site'
 import Disco from './Disco'
 import Mazo from './Mazo'
-import Tarot from './Tarot'
 import Fotos from './Fotos'
 import Marca from './Marca'
 
@@ -60,8 +59,8 @@ export default function Categoria({ cat, abrir, ir, inicio }) {
       {cat.especial === 'disco' && <Disco abrir={abrir} />}
       {cat.especial === 'cartas' && (
         <>
-          <Mazo abrir={abrir} />
-          <Tarot abrir={abrir} />
+          <Mazo id="principito" abrir={abrir} />
+          <Mazo id="tarot" abrir={abrir} />
         </>
       )}
       {cat.especial === 'fotos' && <Fotos sinCabeza />}
@@ -75,7 +74,7 @@ export default function Categoria({ cat, abrir, ir, inicio }) {
         <button onClick={(e) => ir(sig.id, e.currentTarget.querySelector('img'))}>
           <small>Siguiente categoría</small>
           <strong>{sig.nombre}</strong>
-          <img src={img(sig.portada.src, 'sm')} width={sig.portada.w} height={sig.portada.h} alt="" loading="lazy" decoding="async" />
+          <img src={sig.portada.src.includes('/') ? `/img/${sig.portada.src}.webp` : img(sig.portada.src, 'sm')} width={sig.portada.w} height={sig.portada.h} alt="" loading="lazy" decoding="async" />
         </button>
       </nav>
     </div>

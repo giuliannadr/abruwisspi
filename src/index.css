@@ -511,8 +511,8 @@ figure {
 /* ---------- Caja 3D ---------- */
 .caja {
   --w: min(17vw, 240px);
-  --h: calc(var(--w) * 1020 / 720);
-  --d: calc(var(--w) * 190 / 720);
+  --h: calc(var(--w) * var(--rh, 1.4167));
+  --d: calc(var(--w) * var(--rd, 0.2639));
   position: relative;
   margin: 0;
   padding: var(--d) calc(var(--d) * 0.6) calc(var(--d) * 0.6);
@@ -600,7 +600,7 @@ figure {
 }
 .caja__tapa-dentro {
   transform: rotateX(180deg);
-  background: #23256a;
+  background: var(--dentro, #23256a);
 }
 /* la boca: el fondo oscuro de adentro, apenas debajo de la tapa */
 .caja__boca {
@@ -609,7 +609,7 @@ figure {
   top: calc((var(--h) - var(--d)) / 2);
   width: var(--w);
   height: var(--d);
-  background: #14163f;
+  background: var(--boca, #14163f);
   transform: rotateX(90deg) translateZ(calc(var(--h) / 2 - 3px));
 }
 .caja__cara--base {
@@ -2125,8 +2125,8 @@ img.sobre__foto {
 
 /* ---------- El Principito (2026-11-23): caja y cartas al centro, textos en las esquinas ---------- */
 .principito {
-  --cw: min(17vw, 260px, 42svh * 760 / 1200);
-  --ch: calc(var(--cw) * 1200 / 760);
+  --cw: min(17vw, 260px, 42svh * var(--car, 0.6333));
+  --ch: calc(var(--cw) / var(--car, 0.6333));
   --arriba: var(--claro);
   position: relative;
   height: 100svh;
@@ -2690,158 +2690,6 @@ html::-webkit-scrollbar {
   outline-offset: -10px;
 }
 
-/* ---------- Tarot ---------- */
-.tarot {
-  --tw: min(15vw, 230px, 44svh * 945 / 1417);
-  --tg: 28px;
-  --borde: max(var(--m), calc((100% - (4 * var(--tw) + 3 * var(--tg))) / 2));
-  --arriba: var(--rosa);
-  position: relative;
-  height: 100svh;
-  min-height: 680px;
-  background: var(--bordo) url(/tex/grano.webp);
-  color: var(--rosa);
-  overflow: hidden;
-}
-.tarot__mesa {
-  position: absolute;
-  inset: 0;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: var(--tg);
-}
-.tarot__carta {
-  width: var(--tw);
-  aspect-ratio: 945 / 1417;
-  padding: 0;
-  border: 0;
-  background: none;
-  cursor: pointer;
-  perspective: 1400px;
-  -webkit-tap-highlight-color: transparent;
-}
-.tarot__carta:focus-visible {
-  outline: 3px solid var(--rosa);
-  outline-offset: 6px;
-}
-.tarot__cuerpo {
-  display: block;
-  position: relative;
-  width: 100%;
-  height: 100%;
-  transform-style: preserve-3d;
-  transition: transform 620ms cubic-bezier(0.23, 1, 0.32, 1);
-}
-.tarot__carta[data-flip] .tarot__cuerpo {
-  transform: rotateY(180deg);
-}
-.tarot__cara {
-  position: absolute;
-  inset: 0;
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  border-radius: 6px;
-  backface-visibility: hidden;
-  pointer-events: none;
-}
-.tarot__cara--dorso {
-  transform: rotateY(180deg);
-}
-.tarot__esquina {
-  position: absolute;
-  z-index: 2;
-  margin: 0;
-}
-.tarot__esquina--titulo {
-  top: 92px;
-  left: var(--borde);
-}
-.tarot__esquina--botones {
-  top: 104px;
-  right: var(--borde);
-  display: grid;
-  justify-items: end;
-  gap: 10px;
-}
-.tarot__esquina--texto {
-  left: var(--borde);
-  right: var(--borde);
-  bottom: 40px;
-  max-width: 78ch;
-}
-.tarot__disc {
-  margin: 0 0 10px;
-  font-weight: 800;
-  font-size: 13px;
-  text-transform: uppercase;
-}
-.tarot__titulo {
-  margin: 0;
-  font-weight: 900;
-  font-stretch: 62%;
-  text-transform: uppercase;
-  line-height: 0.82;
-  font-size: clamp(44px, 4.6vw, 80px);
-  color: var(--rosa);
-}
-.tarot__desc {
-  font-size: 15px;
-  line-height: 1.45;
-  text-wrap: pretty;
-}
-.tarot__pista {
-  margin: 0;
-  font-weight: 800;
-  font-size: 12px;
-  text-transform: uppercase;
-}
-.tarot .disco__celdas > :last-child {
-  background: var(--rosa);
-  color: var(--bordo);
-}
-@media (max-width: 860px) {
-  .tarot {
-    height: auto;
-    min-height: 0;
-    display: flex;
-    flex-direction: column;
-    gap: 20px;
-    padding: 80px var(--m) 56px;
-  }
-  .tarot__esquina {
-    position: static;
-  }
-  .tarot__esquina--titulo {
-    order: 1;
-  }
-  .tarot__mesa {
-    position: static;
-    order: 2;
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 14px;
-    justify-items: center;
-  }
-  .tarot__carta {
-    width: 100%;
-  }
-  .tarot__esquina--texto {
-    order: 3;
-  }
-  .tarot__esquina--botones {
-    order: 4;
-    justify-items: stretch;
-  }
-  .tarot__titulo {
-    font-size: 15vw;
-  }
-  .tarot__desc {
-    font-size: 14px;
-  }
-}
-
 /* ---------- Inicio: la mesa de objetos (2026-11-23, reemplaza la lista de texto) ---------- */
 .cats {
   background: var(--claro) url(/tex/grano.webp);
@@ -3252,4 +3100,34 @@ img {
 }
 .visor img {
   pointer-events: auto;
+}
+.estudio__mano {
+  width: 100%;
+}
+
+/* Tarot: el mismo mazo con caja, en bordó; cuatro cartas, un poco más chicas para que entren en fila */
+.principito--tarot {
+  --cw: min(13.5vw, 220px, 40svh * var(--car));
+  background: var(--bordo) url(/tex/grano.webp);
+  color: var(--rosa);
+}
+.principito--tarot .principito__titulo {
+  color: var(--rosa);
+}
+.principito--tarot .disco__celdas > :last-child {
+  background: var(--rosa);
+  color: var(--bordo);
+}
+.principito--tarot .caja__sombra {
+  background: radial-gradient(closest-side, rgba(0, 0, 0, 0.45), transparent);
+}
+@media (max-width: 860px) {
+  .principito--tarot {
+    --cw: 30vw;
+  }
+}
+/* la pista va abajo a la derecha: arriba la pisaba la carta al salir de la caja */
+.principito__esquina--pista {
+  top: auto;
+  bottom: 40px;
 }

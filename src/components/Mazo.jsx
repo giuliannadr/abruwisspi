@@ -2,7 +2,7 @@ import { useEffect, useLayoutEffect, useRef, useState } from 'react'
 import { motion, useReducedMotion } from 'motion/react'
 import { gsap } from 'gsap'
 import { ScrollTrigger } from 'gsap/ScrollTrigger'
-import { cartas } from '../data/fotos'
+import { mazos } from '../data/mazos'
 import { porId } from '../data/proyectos'
 import { img } from '../data/site'
 import { reduce } from '../lib/motion'
@@ -10,7 +10,7 @@ import Caja from './Caja'
 
 gsap.registerPlugin(ScrollTrigger)
 
-// El Principito: la caja y las cartas en el centro, a todo el ancho; alrededor, en las esquinas,
+// Un mazo con caja 3D (El Principito o el Tarot, ver data/mazos.js): la caja y las cartas en el centro, a todo el ancho; alrededor, en las esquinas,
 // el título (arriba a la izquierda), los botones chicos (arriba a la derecha) y el texto abajo, a lo ancho,
 // todos alineados con los bordes de la composición (--borde, lo calcula el scroll).
 // El objeto es UNA sola pieza: la caja arranca grande en el centro, al bajar se corre a su lugar,
@@ -19,14 +19,15 @@ gsap.registerPlugin(ScrollTrigger)
 // de la caja, en celu arriba. Grandes, sin tocarse entre ellas ni tocar la caja, sin salir de su columna. Al final: tocar una carta la da vuelta, arrastrarla y soltarla la devuelve
 // a su lugar, y la caja se gira arrastrando.
 // En compu la sección queda fija mientras pasa; en celu se anima sola al pasar, sin fijarse.
-const p = porId.principito
-
 const lerp = (a, b, t) => a + (b - a) * t
 const tramo = (v, a, b) => Math.min(1, Math.max(0, (v - a) / (b - a)))
 const salir = (t) => 1 - Math.pow(1 - t, 3)
 const ida = (t) => (t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2)
 
-export default function Mazo({ abrir }) {
+export default function Mazo({ id = 'principito', abrir }) {
+  const p = porId[id]
+  const { cartas, ...caja3d } = mazos[id]
+  const n = cartas.length
   const sec = useRef(null), escena = useRef(null), caja = useRef(null)
   const salidas = useRef([])
   const repintar = useRef(() => {})
@@ -53,10 +54,11 @@ export default function Mazo({ abrir }) {
       const bh = caja.current.querySelector('.caja__escena').offsetHeight
       // dónde termina la caja: compu, a la derecha de la fila (todo el grupo centrado); celu, abajo
       const gap = celu ? 0 : Math.min(40, e.width * 0.025)
-      const total = 3 * cw + 2 * gap + gap * 1.6 + bw
+      const total = n * cw + (n - 1) * gap + gap * 1.6 + bw
       const izq = (e.width - total) / 2
-      const finX = celu ? 0 : izq + 3 * cw + 2 * gap + gap * 1.6 + bw / 2 - e.width / 2
-      const finY = celu ? e.height - 96 - bh / 2 - e.height / 2 : 0
+      const finX = celu ? 0 : izq + n * cw + (n - 1) * gap + gap * 1.6 + bw / 2 - e.width / 2
+      const bajar = celu ? 0 : Math.min(48, e.height * 0.05) // en compu el grupo va un poco más abajo: la carta que sale no toca los botones
+      const finY = celu ? e.height - 96 - bh / 2 - e.height / 2 : bajar
       // los textos de las esquinas se alinean con los bordes de la composición (cartas + caja)
       if (!celu) sec.current.style.setProperty('--borde', `${Math.max(0, izq)}px`)
       // 1) la caja arranca grande en el centro y se desliza a su lugar
@@ -72,16 +74,17 @@ export default function Mazo({ abrir }) {
       if (celu) {
         // celu: la caja abajo al centro; las cartas en fila arriba de la tapa, un poco montadas como una mano
         const y = boca.y - 56 - ch / 2
-        filas = [-1, 0, 1].map((k) => ({ x: e.width / 2 + k * cw * 0.78, y: y + Math.abs(k) * 10 }))
-        giros = [-6, 0, 6]
+        const paso = Math.min(cw * 0.78, (e.width - cw - 16) / Math.max(1, n - 1))
+        filas = cartas.map((_, i) => { const k = i - (n - 1) / 2; return { x: e.width / 2 + k * paso, y: y + Math.abs(k) * 10 } })
+        giros = cartas.map((_, i) => (i - (n - 1) / 2) * 6)
       } else {
         // compu: la fila a la izquierda de la caja, apoyadas en la misma línea que ella
-        const base = e.height / 2 + bh / 2
-        filas = [0, 1, 2].map((i) => ({ x: izq + cw / 2 + i * (cw + gap), y: base - ch / 2 }))
-        giros = [-3, 2, -1.5]
+        const base = e.height / 2 + bh / 2 + bajar
+        filas = cartas.map((_, i) => ({ x: izq + cw / 2 + i * (cw + gap), y: base - ch / 2 }))
+        giros = cartas.map((_, i) => [-3, 2, -1.5, 2.5][i % 4])
       }
       salidas.current.forEach((el, i) => {
-        const a = 0.36 + i * 0.17
+        const a = 0.36 + i * (0.35 / Math.max(1, n - 1)) // las cartas salen de a una, terminen como terminen
         const sube = salir(tramo(prog, a, a + 0.1)) // sale derecha por la boca
         const va = ida(tramo(prog, a + 0.1, a + 0.24)) // va a su lugar
         const yAdentro = boca.y + (ch * s0) / 2
@@ -132,10 +135,10 @@ export default function Mazo({ abrir }) {
   }, [fase])
 
   return (
-    <section className="principito" id="cartas" aria-labelledby="mazo-h" ref={sec} data-fase={fase}>
+    <section className={`principito principito--${id}`} id={`mazo-${id}`} aria-labelledby={`mazo-${id}-h`} ref={sec} data-fase={fase} style={{ '--car': cartas[0].w / cartas[0].h }}>
       <div className="principito__objeto" ref={escena}>
         <div className="principito__caja">
-          <Caja frente={fase === 'saliendo'} sinGiroSolo={fase === 'lista'} cajaRef={caja} />
+          <Caja frente={fase === 'saliendo'} sinGiroSolo={fase === 'lista'} cajaRef={caja} {...caja3d} />
         </div>
 
         {cartas.map((c, i) => (
@@ -157,10 +160,10 @@ export default function Mazo({ abrir }) {
             >
               <div className="carta__cuerpo">
                 <div className="carta__cara">
-                  <img src={img(`carta-${c.id}`, 'sm')} srcSet={`${img(`carta-${c.id}`, 'sm')} 600w, ${img(`carta-${c.id}`)} 1200w`} sizes="220px" width={c.w} height={c.h} alt="" draggable="false" loading="lazy" />
+                  <img src={img(c.frente, 'sm')} srcSet={`${img(c.frente, 'sm')} 600w, ${img(c.frente)} ${c.w}w`} sizes="240px" width={c.w} height={c.h} alt="" draggable="false" loading="lazy" data-pieza={i === 0 ? id : undefined} />
                 </div>
                 <div className="carta__cara carta__cara--dorso">
-                  <img src={img(`dorso-${c.id}`, 'sm')} width={c.w} height={c.h} alt="" draggable="false" loading="lazy" />
+                  <img src={img(c.dorso, 'sm')} width={c.w} height={c.h} alt="" draggable="false" loading="lazy" />
                 </div>
               </div>
             </motion.div>
@@ -172,11 +175,11 @@ export default function Mazo({ abrir }) {
       {/* alrededor, en las esquinas: título arriba a la izquierda, texto abajo a la izquierda, botones abajo a la derecha */}
       <header className="principito__esquina principito__esquina--titulo">
         <p className="principito__disc">{p.disciplina}</p>
-        <h2 className="principito__titulo" id="mazo-h">{p.titulo}</h2>
+        <h2 className="principito__titulo" id={`mazo-${id}-h`}>{p.titulo}</h2>
       </header>
       <div className="principito__esquina principito__esquina--botones">
         <div className="disco__celdas">
-          <button onClick={(e) => abrir('principito', e.currentTarget)}>Ver el proyecto</button>
+          <button onClick={(e) => abrir(id, e.currentTarget)}>Ver el proyecto</button>
           <button onClick={todas} disabled={fase !== 'lista'}>Dar vuelta las cartas</button>
         </div>
       </div>

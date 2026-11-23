@@ -10,14 +10,15 @@ import { reduce } from '../lib/motion'
 // reemplazar las seis imágenes de public/img/caja (mismos nombres y proporciones:
 // frente y dorso 720 × 1020, costados 190 × 1020, tapa y base 720 × 190).
 const caras = [
-  { id: 'frente', alt: 'Frente de la caja: El Principito, edición limitada' },
-  { id: 'dorso', alt: 'Dorso de la caja con el texto del juego' },
-  { id: 'izq', alt: 'Costado de la caja: El Principito' },
-  { id: 'der', alt: 'Costado de la caja: 50 naipes coleccionables' },
-  { id: 'base', alt: '' },
+  { id: 'frente', alt: (n) => `Frente de la caja ${n}` },
+  { id: 'dorso', alt: (n) => `Dorso de la caja ${n}` },
+  { id: 'izq', alt: (n) => `Costado de la caja ${n}` },
+  { id: 'der', alt: (n) => `Otro costado de la caja ${n}` },
+  { id: 'base', alt: () => '' },
 ]
 
-export default function Caja({ frente = false, sinGiroSolo = false, onToque, cajaRef }) {
+// `carpeta`: dónde están las seis caras (public/img/<carpeta>); `rh` y `rd`: alto y profundidad sobre el ancho.
+export default function Caja({ frente = false, sinGiroSolo = false, onToque, cajaRef, carpeta = 'caja', rh = 1020 / 720, rd = 190 / 720, nombre = 'del mazo', dentro = '#23256a', boca = '#14163f' }) {
   const ref = useRef(null)
   const cuerpo = useRef(null)
   const modo = useRef({ frente, sinGiroSolo, onToque })
@@ -119,17 +120,17 @@ export default function Caja({ frente = false, sinGiroSolo = false, onToque, caj
   useEffect(() => { despertarRef.current() }, [frente])
 
   return (
-    <figure className="caja" ref={ref} tabIndex={0} data-frente={frente || undefined} aria-label={frente ? 'Caja del mazo en 3D, abierta' : 'Caja del mazo en 3D. Arrastrala o usá las flechas para girarla.'}>
+    <figure className="caja" ref={ref} tabIndex={0} data-frente={frente || undefined} style={{ '--rh': rh, '--rd': rd, '--dentro': dentro, '--boca': boca }} aria-label={frente ? `Caja ${nombre} en 3D, abierta` : `Caja ${nombre} en 3D. Arrastrala o usá las flechas para girarla.`}>
       <div className="caja__escena">
         <div className="caja__cuerpo" ref={cuerpo}>
           {caras.map((f) => (
-            <img key={f.id} className={`caja__cara caja__cara--${f.id}`} src={`/img/caja/${f.id}.webp`} alt={f.alt} draggable="false" loading="lazy" decoding="async" />
+            <img key={f.id} className={`caja__cara caja__cara--${f.id}`} src={`/img/${carpeta}/${f.id}.webp`} alt={f.alt(nombre)} draggable="false" loading="lazy" decoding="async" />
           ))}
           {/* adentro: el fondo oscuro que se ve cuando la tapa se levanta */}
           <span className="caja__boca" aria-hidden="true" />
           {/* la tapa gira sobre el borde de atrás; por dentro es lisa */}
           <div className="caja__tapa" aria-hidden="true">
-            <img className="caja__tapa-afuera" src="/img/caja/tapa.webp" alt="" draggable="false" loading="lazy" decoding="async" />
+            <img className="caja__tapa-afuera" src={`/img/${carpeta}/tapa.webp`} alt="" draggable="false" loading="lazy" decoding="async" />
             <span className="caja__tapa-dentro" />
           </div>
         </div>
