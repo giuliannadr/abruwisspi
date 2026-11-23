@@ -3262,3 +3262,31 @@ img {
     font-size: 5.6vw;
   }
 }
+
+/* Sobre mí con el texto de Abril: más largo que la bio provisoria, va más chico para no ser un bloque */
+.sobre__bio {
+  font-size: clamp(18px, 1.5vw, 23px);
+  line-height: 1.4;
+  max-width: 46ch;
+}
+.sobre__bio--2 {
+  font-size: 16px;
+  line-height: 1.55;
+  max-width: 54ch;
+}
+/* Reels centrados (si no entran, se deslizan desde el margen) */
+.fotos .reels {
+  justify-content: safe center;
+}
+@media (max-width: 860px) {
+  /* celu: los reels se deslizan; arrancan en el margen, no pegados al borde */
+  .fotos .serie .reels {
+    justify-content: start;
+    padding-inline: var(--m);
+  }
+}
+@media (max-width: 860px) {
+  .fotos .serie .reels {
+    scroll-padding-inline: var(--m); /* el imantado respeta el margen: el primer reel no queda pegado al borde */
+  }
+}
