@@ -1,6 +1,7 @@
 import { useEffect, useRef } from 'react'
 import { proyectos, temaDe, fichas } from '../data/proyectos'
 import { img } from '../data/site'
+import { Ampliable } from './Ampliar'
 
 // Vista de un proyecto: su color, su texto y todas las piezas.
 // La primera pieza recibe la imagen que se tocó (view-transition-name: pieza).
@@ -44,18 +45,20 @@ export default function Vista({ p, cerrar, abrir }) {
       </header>
       <div className="vista__piezas" style={{ '--cols': Math.min(p.piezas.length, 3) }}>
         {p.piezas.map((f, k) => (
-          <img
-            key={f.src}
-            src={img(f.src)}
-            srcSet={`${img(f.src, 'sm')} 900w, ${img(f.src)} ${f.w}w`}
-            sizes="(max-width: 760px) 100vw, 45vw"
-            width={f.w}
-            height={f.h}
-            alt={f.alt}
-            loading={k === 0 ? 'eager' : 'lazy'}
-            style={k === 0 ? { viewTransitionName: 'pieza' } : undefined}
-            data-vt-fijo={k === 0 ? '' : undefined}
-          />
+          <Ampliable key={f.src} src={img(f.src)} w={f.w} h={f.h} alt={f.alt} className="vista__pieza">
+            <img
+              src={img(f.src)}
+              srcSet={`${img(f.src, 'sm')} 900w, ${img(f.src)} ${f.w}w`}
+              sizes="(max-width: 760px) 100vw, 45vw"
+              width={f.w}
+              height={f.h}
+              alt={f.alt}
+              loading={k === 0 ? 'eager' : 'lazy'}
+              style={k === 0 ? { viewTransitionName: 'pieza' } : undefined}
+              data-vt-fijo={k === 0 ? '' : undefined}
+              data-vt-nombre={k === 0 ? 'pieza' : undefined}
+            />
+          </Ampliable>
         ))}
       </div>
       <nav className="vista__otros" aria-label="Otros proyectos">

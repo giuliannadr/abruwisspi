@@ -6,6 +6,7 @@ const conClaves = (t) => t.split(/\*\*(.+?)\*\*/g).map((x, i) => (i % 2 ? <mark 
 import { img } from '../data/site'
 import { transicion, getLenis, reduce, scrollTo as irA } from '../lib/motion'
 import { useArrastre } from '../lib/arrastre'
+import { Ampliable } from './Ampliar'
 
 // Fotografía (2026-11-23): todo sobre el mismo papel claro, sin franjas de color ni costuras.
 // Un índice arriba; cada serie separada por una línea fina: título a la izquierda, texto chico al lado
@@ -25,6 +26,34 @@ function verEnPantalla(v) {
   }, { rootMargin: '400px' }).observe(v)
   // arranca recién cuando se ve más de la mitad: menos videos decodificando a la vez mientras se scrollea
   new IntersectionObserver(([e]) => (e.isIntersecting ? v.play().catch(() => {}) : v.pause()), { threshold: 0.5 }).observe(v)
+}
+
+// Reels en celu: si no entran en la pantalla, pasan solos de a uno (y del último vuelven al primero).
+// Se frenan un rato si la persona los toca o los desliza, y no corren si no se ven.
+function useReelsSolos(ref) {
+  useEffect(() => {
+    const el = ref.current
+    if (!el || reduce()) return
+    let visible = false, quieto = 0
+    const io = new IntersectionObserver(([e]) => { visible = e.isIntersecting }, { threshold: 0.4 })
+    io.observe(el)
+    const pausa = () => { quieto = performance.now() + 5000 }
+    el.addEventListener('pointerdown', pausa)
+    el.addEventListener('touchstart', pausa, { passive: true })
+    el.addEventListener('wheel', pausa, { passive: true })
+    const t = setInterval(() => {
+      if (!visible || performance.now() < quieto || el.scrollWidth <= el.clientWidth + 8) return
+      const primero = el.firstElementChild
+      const paso = primero ? primero.getBoundingClientRect().width + parseFloat(getComputedStyle(el).columnGap || '12') : el.clientWidth
+      const max = el.scrollWidth - el.clientWidth
+      const sig = el.scrollLeft + paso > max + 4 ? 0 : el.scrollLeft + paso
+      el.scrollTo({ left: sig, behavior: 'smooth' })
+    }, 3200)
+    return () => {
+      clearInterval(t); io.disconnect()
+      el.removeEventListener('pointerdown', pausa); el.removeEventListener('touchstart', pausa); el.removeEventListener('wheel', pausa)
+    }
+  }, [ref])
 }
 
 function Tira({ s, abrir }) {
@@ -111,6 +140,8 @@ function Tira({ s, abrir }) {
 }
 
 export default function Fotos({ sinCabeza = false }) {
+  const reelsRef = useRef(null)
+  useReelsSolos(reelsRef)
   const [abierta, setAbierta] = useState(null) // { s, i }
 
   const abrir = (s, i, el) => transicion(() => setAbierta({ s, i }), { from: el })
@@ -175,10 +206,12 @@ export default function Fotos({ sinCabeza = false }) {
             <b>({reels.length})</b> {conClaves(reelsBajada)}
           </p>
         </header>
-        <div className="reels">
+        <div className="reels" ref={reelsRef}>
           {reels.map((r, i) => (
             <figure className="reel" key={r.id} data-reveal style={{ '--i': i }}>
-              <video ref={verEnPantalla} data-src={`/video/${r.id}.mp4`} data-poster={`/video/${r.id}.jpg`} muted loop playsInline preload="metadata" width="540" height="960" aria-label={r.alt} />
+              <Ampliable src={`/video/${r.id}.mp4`} w={540} h={960} alt={r.alt} video className="reel__boton">
+                <video ref={verEnPantalla} data-src={`/video/${r.id}.mp4`} data-poster={`/video/${r.id}.jpg`} muted loop playsInline preload="metadata" width="540" height="960" aria-label={r.alt} />
+              </Ampliable>
               <figcaption>{r.titulo}</figcaption>
             </figure>
           ))}

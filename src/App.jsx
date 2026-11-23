@@ -7,6 +7,7 @@ import Categoria from './components/Categoria'
 import Sobre from './components/Sobre'
 import Cierre from './components/Cierre'
 import Vista from './components/Vista'
+import Ampliador from './components/Ampliar'
 import { porId } from './data/proyectos'
 import { catPorId } from './data/categorias'
 import { startLenis, getLenis, observeReveals, transicion, derivas } from './lib/motion'
@@ -132,6 +133,7 @@ export default function App() {
       </main>
       <Cierre />
       {abierto && <Vista p={porId[abierto]} cerrar={cerrar} abrir={abrir} />}
+      <Ampliador />
     </>
   )
 }

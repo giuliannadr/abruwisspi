@@ -3290,3 +3290,105 @@ img {
     scroll-padding-inline: var(--m); /* el imantado respeta el margen: el primer reel no queda pegado al borde */
   }
 }
+@media (max-width: 860px) {
+  /* el orden de celu sale del orden real de la página (con order de CSS, al fijar la caja se rompía) */
+  .principito__esquina,
+  .principito__objeto {
+    order: 0 !important;
+  }
+}
+@media (max-width: 860px) {
+  /* siguiente categoría en celu: la pieza más grande y derecha */
+  .catc__sig img {
+    height: 150px;
+    rotate: 0deg;
+  }
+}
+
+/* ---------- Ver en grande (Ampliar.jsx) ---------- */
+.ampliable {
+  display: block;
+  padding: 0;
+  border: 0;
+  margin: 0;
+  background: none;
+  font: inherit;
+  color: inherit;
+  text-align: inherit;
+  cursor: zoom-in;
+  -webkit-tap-highlight-color: transparent;
+}
+.ampliable:focus-visible {
+  outline: 3px solid var(--cherry);
+  outline-offset: 4px;
+}
+.ampliable > img,
+.ampliable > video {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+/* la vista de proyecto: la imagen mantiene su tamaño de siempre (alto máximo, sin estirarse) */
+.vista__pieza {
+  max-width: 100%;
+}
+.vista__piezas .ampliable > img {
+  width: auto;
+}
+/* Patagonia: las piezas ya tenían su lugar; ahora lo tiene el botón */
+.estudio__aplic .estudio__foto img {
+  aspect-ratio: 4 / 5;
+  object-fit: cover;
+}
+.estudio__marca .ampliable {
+  justify-self: center;
+}
+.reel__boton video {
+  aspect-ratio: 9 / 16;
+  object-fit: cover;
+}
+.ampliador {
+  position: fixed;
+  inset: 0;
+  z-index: 120;
+  display: grid;
+  place-items: center;
+  padding: 64px 20px 32px;
+  background: rgba(253, 238, 241, 0.97);
+  cursor: zoom-out;
+}
+.ampliador img,
+.ampliador video {
+  max-width: min(94vw, 1600px);
+  max-height: calc(100svh - 110px);
+  width: auto;
+  height: auto;
+  object-fit: contain;
+  cursor: auto;
+}
+.ampliador video {
+  pointer-events: auto;
+  background: #000;
+}
+.ampliador__cerrar {
+  position: absolute;
+  top: 16px;
+  right: var(--m);
+  min-height: 40px;
+  padding: 0 18px;
+  border: 0;
+  border-radius: 999px;
+  background: var(--bordo);
+  color: var(--rosa);
+  font: 800 13px / 1 var(--font-sans);
+  text-transform: uppercase;
+  cursor: pointer;
+}
+.ampliador__cerrar:focus-visible {
+  outline: 3px solid var(--cherry);
+  outline-offset: 3px;
+}
+::view-transition-group(ampliada) {
+  animation-duration: 420ms;
+  animation-timing-function: cubic-bezier(0.23, 1, 0.32, 1);
+}
