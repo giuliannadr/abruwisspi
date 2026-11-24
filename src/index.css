@@ -3392,3 +3392,16 @@ img {
   animation-duration: 420ms;
   animation-timing-function: cubic-bezier(0.23, 1, 0.32, 1);
 }
+@media (max-width: 860px) {
+  /* el bloque fijo de la caja ocupa todo el ancho sin margen negativo (al fijarlo, el margen se perdía y
+     todo quedaba 16 px corrido a la izquierda); el margen lo llevan los textos */
+  .principito {
+    padding-inline: 0;
+  }
+  .principito__objeto {
+    margin-inline: 0;
+  }
+  .principito__esquina {
+    padding-inline: var(--m);
+  }
+}

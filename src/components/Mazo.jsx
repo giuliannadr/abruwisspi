@@ -95,7 +95,7 @@ export default function Mazo({ id = 'principito', abrir }) {
       if (celu) {
         // celu: la caja abajo al centro; las cartas en fila arriba de la tapa, un poco montadas como una mano
         const y = k0.y - 56 - ch / 2
-        const paso = Math.min(cw * 0.78, (W - cw - 16) / Math.max(1, n - 1))
+        const paso = Math.min(cw * 0.78, (W - cw - 44) / Math.max(1, n - 1)) // deja margen a los costados (las cartas se inclinan)
         filas = cartas.map((_, i) => { const k = i - (n - 1) / 2; return { x: W / 2 + k * paso, y: y + Math.abs(k) * 10 } })
         giros = cartas.map((_, i) => (i - (n - 1) / 2) * 6)
       } else {
